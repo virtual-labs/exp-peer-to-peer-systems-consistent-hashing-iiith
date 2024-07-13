@@ -1,0 +1,15 @@
+{
+  "name": "exp-consistent-hashing-iiith",
+  "version": "0.0.0",
+  "description": "Consistent hashing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "wolfram77@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "@virtual-labs/buildexp": "^1.0.5"
+  }
+}
