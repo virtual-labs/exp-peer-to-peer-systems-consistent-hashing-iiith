@@ -1,13 +1,88 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<!-- Add CSS at the head of HTML file -->
-    <link rel="stylesheet" href="./css/main.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/barecss@1.1.1/css/bare.min.css">
+<link rel="stylesheet" href="./css/main.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<title>Consistent Hashing Simulation</title>
 </head>
 <body>
-		<!-- Your code goes here-->
+<!-- Simulation Environment -->
+<section id="simulation">
+  <canvas id="arena" width="1024" height="480"></canvas>
+  <audio id="start-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Startup.mp3"></audio>
+  <audio id="stop-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Shutdown.mp3"></audio>
+  <audio id="pause-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/notify.mp3"></audio>
+  <audio id="adjust-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/chimes.mp3"></audio>
+  <audio id="synchronize-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Logon%20Sound.mp3"></audio>
+</div>
 
-	<!-- Add JS at the bottom of HTML file --> 
-        <script src="./js/main.js"></script>
+<!-- Controls -->
+<section id="controls">
+<form>
+  <div id="buttons">
+    <grid>
+      <div col="1/4"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
+      <div col="1/4"><button full id="stop-simulation" onclick="onStopSimulation()">Stop Simulation</button></div>
+      <div col="1/4"><button full id="adjust-parameters" onclick="onAdjustParameters()">Adjust Parameters</button></div>
+      <div col="1/4"><button full id="clear-plots" onclick="onClearPlots()">Clear Plots</button></div>
+    </grid>
+    <grid>
+      <div col="1/4"><button full id="add-machine" onclick="onAddMachine()">Add Machine</button></div>
+      <div col="1/4"><button full id="remove-machine" onclick="onRemoveMachine()">Remove Machine</button></div>
+      <div col="1/4"><button full id="add-items" onclick="onAddItems()">Add Items</button></div>
+      <div col="1/4"><button full id="remove-items" onclick="onRemoveItems()">Remove Items</button></div>
+    </grid>
+  </div>
+  <div id="plots">
+    <canvas id="plot-items" width="320" height="320"></canvas>
+    <canvas id="plot-migrated" width="320" height="320"></canvas>
+  </div>
+  <grid>
+    <div col="1/2">
+      <h4>Simulation Parameters</h4>
+      <label>Initial number of machines</label>
+      <input type="number" name="initial-machines" placeholder="4">
+      <label>Simulation speed (ms/s)</label>
+      <input type="text" name="simulation-speed" placeholder="10">
+    </div>
+    <div col="1/2">
+      <h4>...</h4>
+      <label>Initial number of items</label>
+      <input type="number" name="initial-items" placeholder="20">
+    </div>
+    <div col="1/2">
+			<h4>Machine Parameters</h4>
+			<label>Machine capacity (items)</label>
+			<input type="number" name="machine-capacity" placeholder="100">
+		</div>
+		<div col="1/2">
+			<h4>...</h4>
+			<label>Virtual nodes per machine</label>
+			<input type="number" name="virtual-nodes" placeholder="1">
+		</div>
+    <div col="1/2">
+			<h4>Item Parameters</h4>
+			<label>Item addition rate (/ms)</label>
+			<input type="number" name="item-additions" placeholder="1">
+			<label>Items to add on click</label>
+			<input type="number" name="click-additions" placeholder="10">
+		</div>
+		<div col="1/2">
+			<h4>...</h4>
+			<label>Item removal rate (/ms)</label>
+			<input type="number" name="item-removals" placeholder="0">
+			<label>Items to remove on click</label>
+			<input type="number" name="click-removals" placeholder="10">
+		</div>
+  </grid>
+</form>
+</section>
+</div>
+
+<script src="./js/main.js"></script>
 </body>
 </html>

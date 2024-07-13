@@ -1,1 +1,11 @@
-/* You CSS goes in here */
+/* Use the entire viewport. */
+body {
+  margin: 0;
+}
+
+
+/* Simulation environment. */
+#simulation > canvas {
+  width: 100%;
+  /* height: 26rem; */
+}
