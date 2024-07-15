@@ -5,8 +5,8 @@ const SIMULATION        = document.querySelector('#simulation canvas');
 const CONTROLS          = document.querySelector('#controls form');
 const START_SIMULATION  = document.querySelector('#start-simulation');
 const STOP_SIMULATION   = document.querySelector('#stop-simulation');
-const PLOT_ITEMS        = document.querySelector('#plot-items');
-const PLOT_MIGRATED     = document.querySelector('#plot-migrated');
+const ITEMS_PLOT        = document.querySelector('#items-plot');
+const MIGRATED_PLOT     = document.querySelector('#migrated-plot');
 const START_AUDIO       = document.querySelector('#start-audio');
 const STOP_AUDIO        = document.querySelector('#stop-audio');
 const PAUSE_AUDIO       = document.querySelector('#pause-audio');
@@ -402,6 +402,12 @@ var simulation = {
 /** Consistent hash ring for the simulation. */
 var hashring = new ConsistentHashRing();
 
+/** Plot of items vs machines. */
+var itemsPlot = null;
+
+/** Plot of migrated items vs machines. */
+var migratedPlot = null;
+
 /** Images for the simulation. */
 var images = {
   isLoaded: false,
@@ -421,6 +427,7 @@ function main() {
   requestAnimationFrame(simulationLoop);
   drawButtons();
   drawPlots();
+  setInterval(drawPlots, 1000);
 }
 main();
 
@@ -489,7 +496,6 @@ function onAdjustParameters() {
 /** Called when "Clear Plots" button is clicked. */
 function onClearPlots() {
   playAudio(STOP_AUDIO);
-  // records = [];
   drawPlots();
 }
 
@@ -499,8 +505,8 @@ function onAddMachine() {
   var h = hashring;
   var s = simulation;
   var p = parameters;
-  var el   = document.querySelector('input[name="add-machine-name"]');
-  var name = baseMachineName(el.value) || 'm' + (++s.lastMachine);
+  var el   = document.querySelector('input[name="add-machine-name"]');;
+  var name = baseMachineName(el.value) || 'm' + s.lastMachine; s.lastMachine++;
   for (var i=0; i<p.virtualNodes; ++i)
     h.addMachine(name + '.' + i);
   playAudio(SYNCHRONIZE_AUDIO);
@@ -524,8 +530,8 @@ function onAddItems() {
   var h = hashring;
   var p = parameters;
   var s = simulation;
-  for (var i=0; i<p.clickAdditions; ++i) {
-    var name = 'o' + (++s.lastItem);
+  for (var i=0; i<p.clickAdditions; ++i, ++s.lastItem) {
+    var name = 'o' + s.lastItem;
     h.addItem(name);
   }
   playAudio(SYNCHRONIZE_AUDIO);
@@ -553,9 +559,10 @@ function stopSimulation() {
 function initSimulation() {
   var h = hashring;
   var p = parameters;
+  var s = simulation;
   resetSimulation();
   // Add initial machines.
-  for (var i=0; i<p.initialMachines; ++i) {
+  for (var i=0; i<p.initialMachines; ++i, ++s.lastMachine) {
     var name = 'm' + i;
     for (var j=0; j<p.virtualNodes; ++j)
       h.addMachineImmediate(name + '.' + j);
@@ -647,6 +654,42 @@ function drawButtons() {
 
 /** Draw the plots for the simulation. */
 function drawPlots() {
+  drawItemsPlot();
+}
+
+
+/** Draw the items plot. */
+function drawItemsPlot() {
+  var h = hashring;
+  var counts = new Map();
+  for (var m of h.machines) {
+    var name = baseMachineName(m.name);
+    var n    = counts.get(name) || 0;
+    counts.set(name, n + m.items);
+  }
+  var labels  = [...counts.keys()];
+  var records = [...counts.values()];
+  itemsPlot = itemsPlot || new Chart(ITEMS_PLOT, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Machine',
+        data: records,
+        backgroundColor: 'rgba(25, 99, 132, 1)',
+        borderColor: 'rgba(25, 99, 132, 1)',
+      }]
+    },
+    options: {
+      scales: {
+        x: {title: {display: true, text: 'Machine'}},
+        y: {title: {display: true, text: 'Item count'}, beginAtZero: true},
+      }
+    }
+  });
+  itemsPlot.data.labels = labels;
+  itemsPlot.data.datasets[0].data = records;
+  itemsPlot.update();
 }
 
 

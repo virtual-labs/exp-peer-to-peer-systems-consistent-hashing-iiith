@@ -15,3 +15,10 @@ body {
 #buttons select {
   margin-top: 0;
 }
+
+
+/* Plot showing round-trip time vs time offset. */
+#items-plot {
+  max-width: 100%;
+  max-height: 40rem;
+}
