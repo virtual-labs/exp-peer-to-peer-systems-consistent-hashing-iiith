@@ -158,19 +158,6 @@ class ConsistentHashRing {
     if (m) m.type = DETACHING;
   }
 
-  /** Prepare to remove n random machines from the hash ring. */
-  removeRandomMachines(n) {
-    var N = partition(this.machines, o => o.type !== DETACHING);
-    var n = Math.min(n, N);
-    // Randomly select n machines to remove.
-    var undetached = this.machines.slice(0, N);
-    undetached.sort(() => Math.random() - 0.5);
-    for (var i=0; i<n; ++i) {
-      var m  = undetached[i];
-      m.type = DETACHING;
-    }
-  }
-
   /** Update the associated machines. */
   updateMachines(dt) {
     // Process machines that are being added.
@@ -235,6 +222,13 @@ class ConsistentHashRing {
   /** Get a machine by name. */
   getMachine(name) {
     return this.machineMap.get(name);
+  }
+
+  /** Get a random machine. */
+  getRandomMachine() {
+    var N = partition(this.machines, o => o.type !== DETACHING);
+    var i = Math.floor(Math.random() * N);
+    return this.machines[i];
   }
 
   /** Find the index of a machine on the ring, based on given hash. */
@@ -482,9 +476,11 @@ function onClearPlots() {
 function onAddMachine() {
   var h = hashring;
   var s = simulation;
+  var p = parameters;
   var el   = document.querySelector('input[name="add-machine-name"]');
-  var name = el.value || 'm' + (++s.lastMachine);
-  h.addMachine(name);
+  var name = baseMachineName(el.value) || 'm' + (++s.lastMachine);
+  for (var i=0; i<p.virtualNodes; ++i)
+    h.addMachine(name + '.' + i);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
@@ -492,9 +488,11 @@ function onAddMachine() {
 /** Called when "Remove Machine" button is clicked. */
 function onRemoveMachine() {
   var h  = hashring;
+  var p  = parameters;
   var el = document.querySelector('input[name="remove-machine-name"]');
-  if (el.value) h.removeMachine(el.value);
-  else          h.removeRandomMachines(1);
+  var name = baseMachineName(el.value || h.getRandomMachine().name);
+  for (var i=0; i<p.virtualNodes; ++i)
+    h.removeMachine(name + '.' + i);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
@@ -576,6 +574,7 @@ function drawParameters() {
 function renderSimulation() {
   var i = images;
   var h = hashring;
+  var p = parameters;
   if (!i.isLoaded) loadImages();
   var ctx  = SIMULATION.getContext('2d');
   ctx.font = '13px sans-serif';
@@ -585,8 +584,8 @@ function renderSimulation() {
   hashring.draw(ctx, HASHRING_X, HASHRING_Y, HASHRING_RADIUS);
   ctx.fillStyle = 'black';
   ctx.fillText('Consistent Hash Ring', HASHRING_X, 0.4 * HASHRING_Y);
-  ctx.fillText('Machines: ' + h.attachedMachineCount(), HASHRING_X, 0.5 * HASHRING_Y);
-  ctx.fillText('Items: '    + h.attachedItemCount(),    HASHRING_X, 0.6 * HASHRING_Y);
+  ctx.fillText('Machines: ' + h.attachedMachineCount() / p.virtualNodes, HASHRING_X, 0.5 * HASHRING_Y);
+  ctx.fillText('Items: '    + h.attachedItemCount(), HASHRING_X, 0.6 * HASHRING_Y);
 }
 
 
@@ -650,6 +649,11 @@ function formNumber(data, key, fn) {
 }
 
 
+/** Get the machine name, without virtual node index. */
+function baseMachineName(name) {
+  var i = name.indexOf('.');
+  return i < 0? name : name.substring(0, i);
+}
 
 
 /** Find begin index of value using binary search. */
