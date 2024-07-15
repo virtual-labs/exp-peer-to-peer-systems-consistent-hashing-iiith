@@ -1,6 +1,6 @@
 {
   "name": "exp-consistent-hashing-iiith",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Consistent hashing",
   "main": "index.js",
   "scripts": {

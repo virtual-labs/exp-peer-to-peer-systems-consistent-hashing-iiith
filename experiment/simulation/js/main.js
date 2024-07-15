@@ -157,6 +157,19 @@ class ConsistentHashRing {
     if (m) m.type = DETACHING;
   }
 
+  /** Prepare to remove n random machines from the hash ring. */
+  removeRandomMachines(n) {
+    var N = partition(this.machines, o => o.type !== DETACHING);
+    var n = Math.min(n, N);
+    // Randomly select n machines to remove.
+    var undetached = this.machines.slice(0, N);
+    undetached.sort(() => Math.random() - 0.5);
+    for (var i=0; i<n; ++i) {
+      var m  = undetached[i];
+      m.type = DETACHING;
+    }
+  }
+
   /** Update the associated machines. */
   updateMachines(dt) {
     // Process machines that are being added.
@@ -206,8 +219,8 @@ class ConsistentHashRing {
     var i = binarySearchBegin(this.ring, m.hash, (a, b) => a.hash - b);
     this.ring.splice(i, 1);
     // Now, migrate items from the machine to the next machine.
-    var l = this.findEarlierMachine(m.hash);
-    var n = this.findLaterMachine(m.hash);
+    var l = this.findEarlierMachine(m.hash) || m;
+    var n = this.findLaterMachine(m.hash)   || m;
     if (l.hash <= m.hash) {
       for (var o of this.items)
         if (o.hash > l.hash && o.hash <= m.hash) this.migrateItem(o, n);
@@ -470,6 +483,14 @@ function onAddMachine() {
   var s = simulation;
   var name = 'm' + (++s.lastMachine);
   h.addMachine(name);
+  playAudio(SYNCHRONIZE_AUDIO);
+}
+
+
+/** Called when "Remove Machine" button is clicked. */
+function onRemoveMachine() {
+  var h = hashring;
+  h.removeRandomMachines(1);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
