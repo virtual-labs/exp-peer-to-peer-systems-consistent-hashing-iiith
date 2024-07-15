@@ -12,7 +12,6 @@ const STOP_AUDIO        = document.querySelector('#stop-audio');
 const PAUSE_AUDIO       = document.querySelector('#pause-audio');
 const ADJUST_AUDIO      = document.querySelector('#adjust-audio');
 const SYNCHRONIZE_AUDIO = document.querySelector('#synchronize-audio');
-const BACKGROUND_IMG    = './images/background.jpg';
 
 const HASHRING_X        = SIMULATION.width / 2;
 const HASHRING_Y        = SIMULATION.height / 2;
@@ -377,7 +376,6 @@ var hashring = new ConsistentHashRing();
 /** Images for the simulation. */
 var images = {
   isLoaded: false,
-  background: null,
 };
 
 
@@ -570,8 +568,6 @@ function renderSimulation() {
 /** Draw the simulation background. */
 function drawBackground(ctx) {
   ctx.clearRect(0, 0, SIMULATION.width, SIMULATION.height);
-  // var i = images;
-  // ctx.drawImage(i.background, 0, 0, 1024, 320);
 }
 
 
@@ -604,7 +600,6 @@ function getMousePos(el, ev) {
 function loadImages() {
   var i = images;
   i.isLoaded   = true;
-  i.background = loadImage(BACKGROUND_IMG);
 }
 
 
