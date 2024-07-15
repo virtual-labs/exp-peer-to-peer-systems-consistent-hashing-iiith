@@ -68,13 +68,13 @@ const MIGRATING_IN  = 5;
  * Defines a machine in the simulation.
  */
 class Machine {
-  constructor(name, hash, speed) {
+  constructor(name, hash, speed, state=0) {
     this.isAttached = false;
     this.name  = name;
     this.hash  = hash;
     this.type  = ATTACHING;
     this.speed = speed;
-    this.state = 0;
+    this.state = state;
     this.items = 0;
   }
 }
@@ -103,6 +103,15 @@ class ConsistentHashRing {
     this.ring       = [];
     this.items      = [];
     this.machines   = [];
+  }
+
+  /** Reset the hash ring. */
+  reset() {
+    this.itemMap.clear();
+    this.machineMap.clear();
+    this.ring.length = 0;
+    this.items.length = 0;
+    this.machines.length = 0;
   }
 
   /** Update simulation state of the hash ring. */
@@ -150,6 +159,18 @@ class ConsistentHashRing {
     var m = new Machine(name, hash, speed);
     this.machineMap.set(name, m);
     this.machines.push(m);
+  }
+
+  /** Attach a machine to the hash ring, immediately. */
+  addMachineImmediate(name) {
+    var p = parameters;
+    if (this.machineMap.has(name)) return;
+    var hash  = cyrb53(name);
+    var speed = 1 / (p.machineUpdateTime * (0.5 + Math.random()));
+    var m = new Machine(name, hash, speed, 1);
+    this.machineMap.set(name, m);
+    this.machines.push(m);
+    this.attachMachine(m);
   }
 
   /** Prepare to detach a machine from the hash ring. */
@@ -439,6 +460,7 @@ function onControls(e) {
 /** Called when "Start Simulation" button is clicked. */
 function onStartSimulation() {
   adjustParameters();
+  initSimulation();
   var s = simulation;
   if (!s.isRunning) playAudio(START_AUDIO);
   else playAudio(PAUSE_AUDIO);
@@ -527,15 +549,35 @@ function stopSimulation() {
 }
 
 
+/** Initialize the simulation. */
+function initSimulation() {
+  var h = hashring;
+  var p = parameters;
+  resetSimulation();
+  // Add initial machines.
+  for (var i=0; i<p.initialMachines; ++i) {
+    var name = 'm' + i;
+    for (var j=0; j<p.virtualNodes; ++j)
+      h.addMachineImmediate(name + '.' + j);
+  }
+  // Add initial items.
+  for (var i=0; i<p.initialItems; ++i)
+    h.addItem('o' + i);
+}
+
+
 /** Reset the simulation. */
 function resetSimulation() {
+  var h = hashring;
   var s = simulation;
   s.isRunning = false;
   s.isPaused  = false;
   s.isResumed = true;
   s.timestamp = 0;
   s.time      = 0;
-  // packets = [];
+  s.lastMachine = 0;
+  s.lastItem    = 0;
+  h.reset();
 }
 
 
