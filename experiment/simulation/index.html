@@ -25,12 +25,28 @@
 <form>
   <div id="buttons">
     <grid>
+      <div col="2/4">
+      <select id="select-experiment" onchange="onSelectExperiment()">
+        <option disabled selected>Select an Experiment</option>
+        <option value="lan-x">No virtual nodes (low capacity)</option>
+        <option value="lan-x">No virtual nodes (high capacity)</option>
+        <option value="lan-n">2 virtual nodes (low capacity)</option>
+        <option value="lan-a">2 virtual nodes (high capacity)</option>
+        <option value="lan-n">4 virtual nodes (low capacity)</option>
+        <option value="lan-a">4 virtual nodes (high capacity)</option>
+        <option value="lan-n">8 virtual nodes (low capacity)</option>
+        <option value="lan-a">8 virtual nodes (high capacity)</option>
+        <option value="usr-x">Custom</option>
+      </select>
+      </div>
       <div col="1/4"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
       <div col="1/4"><button full id="stop-simulation" onclick="onStopSimulation()">Stop Simulation</button></div>
-      <div col="1/4"><button full id="adjust-parameters" onclick="onAdjustParameters()">Adjust Parameters</button></div>
-      <div col="1/4"><button full id="clear-plots" onclick="onClearPlots()">Clear Plots</button></div>
     </grid>
     <grid>
+      <div col="1/4"><input type="text" txt="c" name="add-machine-name" placeholder="Machine to add"></button></div>
+      <div col="1/4"><input type="text" txt="c" name="remove-machine-name" placeholder="Machine to remove"></button></div>
+      <div col="1/4"><button full id="reset-parameters" onclick="onResetParameters()">Reset Parameters</button></div>
+      <div col="1/4"><button full id="clear-plots" onclick="onClearPlots()">Clear Plots</button></div>
       <div col="1/4"><button full id="add-machine" onclick="onAddMachine()">Add Machine</button></div>
       <div col="1/4"><button full id="remove-machine" onclick="onRemoveMachine()">Remove Machine</button></div>
       <div col="1/4"><button full id="add-items" onclick="onAddItems()">Add Items</button></div>

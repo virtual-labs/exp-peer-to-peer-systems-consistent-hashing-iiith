@@ -144,6 +144,7 @@ class ConsistentHashRing {
   /** Prepare to attach a machine to the hash ring. */
   addMachine(name) {
     var p = parameters;
+    if (this.machineMap.has(name)) return;
     var hash  = cyrb53(name);
     var speed = 1 / (p.machineUpdateTime * (0.5 + Math.random()));
     var m = new Machine(name, hash, speed);
@@ -481,7 +482,8 @@ function onClearPlots() {
 function onAddMachine() {
   var h = hashring;
   var s = simulation;
-  var name = 'm' + (++s.lastMachine);
+  var el   = document.querySelector('input[name="add-machine-name"]');
+  var name = el.value || 'm' + (++s.lastMachine);
   h.addMachine(name);
   playAudio(SYNCHRONIZE_AUDIO);
 }
@@ -489,8 +491,10 @@ function onAddMachine() {
 
 /** Called when "Remove Machine" button is clicked. */
 function onRemoveMachine() {
-  var h = hashring;
-  h.removeRandomMachines(1);
+  var h  = hashring;
+  var el = document.querySelector('input[name="remove-machine-name"]');
+  if (el.value) h.removeMachine(el.value);
+  else          h.removeRandomMachines(1);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
