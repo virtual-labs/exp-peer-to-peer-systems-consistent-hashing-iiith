@@ -28,15 +28,11 @@
       <div col="2/4">
       <select id="select-experiment" onchange="onSelectExperiment()">
         <option disabled selected>Select an Experiment</option>
-        <option value="lan-x">No virtual nodes (low capacity)</option>
-        <option value="lan-x">No virtual nodes (high capacity)</option>
-        <option value="lan-n">2 virtual nodes (low capacity)</option>
-        <option value="lan-a">2 virtual nodes (high capacity)</option>
-        <option value="lan-n">4 virtual nodes (low capacity)</option>
-        <option value="lan-a">4 virtual nodes (high capacity)</option>
-        <option value="lan-n">8 virtual nodes (low capacity)</option>
-        <option value="lan-a">8 virtual nodes (high capacity)</option>
-        <option value="usr-x">Custom</option>
+        <option value="1">No virtual nodes</option>
+        <option value="2">2 virtual nodes per machine</option>
+        <option value="4">4 virtual nodes per machine</option>
+        <option value="8">8 virtual nodes per machine</option>
+        <option value="x">Custom</option>
       </select>
       </div>
       <div col="1/4"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
@@ -45,8 +41,8 @@
     <grid>
       <div col="1/4"><input type="text" txt="c" name="add-machine-name" placeholder="Machine to add"></button></div>
       <div col="1/4"><input type="text" txt="c" name="remove-machine-name" placeholder="Machine to remove"></button></div>
+      <div col="1/4"><button full id="adjust-parameters" onclick="onAdjustParameters()">Adjust Parameters</button></div>
       <div col="1/4"><button full id="reset-parameters" onclick="onResetParameters()">Reset Parameters</button></div>
-      <div col="1/4"><button full id="clear-plots" onclick="onClearPlots()">Clear Plots</button></div>
       <div col="1/4"><button full id="add-machine" onclick="onAddMachine()">Add Machine</button></div>
       <div col="1/4"><button full id="remove-machine" onclick="onRemoveMachine()">Remove Machine</button></div>
       <div col="1/4"><button full id="add-items" onclick="onAddItems()">Add Items</button></div>
@@ -62,8 +58,6 @@
       <h4>Simulation Parameters</h4>
       <label>Initial number of machines</label>
       <input type="number" name="initial-machines" placeholder="4">
-      <label>Simulation speed (ms/s)</label>
-      <input type="text" name="simulation-speed" placeholder="10">
     </div>
     <div col="1/2">
       <h4>...</h4>
@@ -72,25 +66,19 @@
     </div>
     <div col="1/2">
 			<h4>Machine Parameters</h4>
-			<label>Machine capacity (items)</label>
-			<input type="number" name="machine-capacity" placeholder="100">
-		</div>
-		<div col="1/2">
-			<h4>...</h4>
 			<label>Virtual nodes per machine</label>
 			<input type="number" name="virtual-nodes" placeholder="1">
 		</div>
+		<div col="1/2">
+			<h4>...</h4>
+		</div>
     <div col="1/2">
 			<h4>Item Parameters</h4>
-			<label>Item addition rate (/ms)</label>
-			<input type="number" name="item-additions" placeholder="1">
 			<label>Items to add on click</label>
 			<input type="number" name="click-additions" placeholder="10">
 		</div>
 		<div col="1/2">
 			<h4>...</h4>
-			<label>Item removal rate (/ms)</label>
-			<input type="number" name="item-removals" placeholder="0">
 			<label>Items to remove on click</label>
 			<input type="number" name="click-removals" placeholder="10">
 		</div>

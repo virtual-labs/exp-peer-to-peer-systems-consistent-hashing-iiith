@@ -3,6 +3,7 @@
 
 const SIMULATION        = document.querySelector('#simulation canvas');
 const CONTROLS          = document.querySelector('#controls form');
+const SELECT_EXPERIMENT = document.querySelector('#select-experiment');
 const START_SIMULATION  = document.querySelector('#start-simulation');
 const STOP_SIMULATION   = document.querySelector('#stop-simulation');
 const ITEMS_PLOT        = document.querySelector('#items-plot');
@@ -38,12 +39,9 @@ const PARAMETERS = {
   initialItems:    20,
   simulationSpeed: 10,
   // Machine parameters.
-  machineCapacity:   100,
   virtualNodes:      1,
   machineUpdateTime: 10,
   // Item parameters.
-  itemAdditions:   1,
-  itemRemovals:    0,
   clickAdditions:  10,
   clickRemovals:   10,
   itemUpdateTime:  10,
@@ -526,9 +524,6 @@ var itemsPlot = null;
 /** Plot of migrations vs machines. */
 var migrationsPlot = null;
 
-/** Plot of migrated items vs machines. */
-var migratedPlot = null;
-
 /** Images for the simulation. */
 var images = {
   isLoaded: false,
@@ -596,9 +591,25 @@ function onControls(e) {
 }
 
 
+/** Called when "Select Experiment" dropdown is changed. */
+function onSelectExperiment() {
+  var p = parameters;
+  ADJUST_AUDIO.play();
+  switch (SELECT_EXPERIMENT.value) {
+    case '1': Object.assign(p, PARAMETERS, {virtualNodes: 1}); break;
+    case '2': Object.assign(p, PARAMETERS, {virtualNodes: 2}); break;
+    case '4': Object.assign(p, PARAMETERS, {virtualNodes: 4}); break;
+    case '8': Object.assign(p, PARAMETERS, {virtualNodes: 8}); break;
+    default:  Object.assign(p, PARAMETERS); break;
+  }
+  stopSimulation();
+  drawParameters();
+}
+
+
 /** Called when "Start Simulation" button is clicked. */
 function onStartSimulation() {
-  adjustParameters();
+  adjustParameters(true);
   initSimulation();
   var s = simulation;
   if (!s.isRunning) playAudio(START_AUDIO);
@@ -618,17 +629,18 @@ function onStopSimulation() {
 }
 
 
-/** Called when "Adjust Parameters" button is clicked. */
-function onAdjustParameters() {
+/** Called when "Adjust Paramters" button is clicked. */
+function onAdjustParamters() {
   playAudio(ADJUST_AUDIO);
   adjustParameters();
+  drawParameters();
 }
 
 
-/** Called when "Clear Plots" button is clicked. */
-function onClearPlots() {
-  playAudio(STOP_AUDIO);
-  drawPlots();
+/** Called when "Reset Parameters" button is clicked. */
+function onResetParameters() {
+  playAudio(ADJUST_AUDIO);
+  drawParameters();
 }
 
 
@@ -736,16 +748,12 @@ function resetSimulation() {
 
 
 /** Adjust parameters based on form input. */
-function adjustParameters() {
+function adjustParameters(fresh=false) {
   var p = parameters;
   var data = new FormData(CONTROLS);
-  formNumber(data, 'initial-machines', x => p.initialMachines = x);
-  formNumber(data, 'initial-items',    x => p.initialItems = x);
-  formNumber(data, 'simulation-speed', x => p.simulationSpeed = x);
-  formNumber(data, 'machine-capacity', x => p.machineCapacity = x);
-  formNumber(data, 'virtual-nodes',    x => p.virtualNodes = x);
-  formNumber(data, 'item-additions',   x => p.itemAdditions = x);
-  formNumber(data, 'item-removals',    x => p.itemRemovals = x);
+  if (fresh) formNumber(data, 'initial-machines', x => p.initialMachines = x);
+  if (fresh) formNumber(data, 'initial-items',    x => p.initialItems = x);
+  if (fresh) formNumber(data, 'virtual-nodes',    x => p.virtualNodes = x);
   formNumber(data, 'click-additions',  x => p.clickAdditions = x);
   formNumber(data, 'click-removals',   x => p.clickRemovals = x);
 }
@@ -756,11 +764,7 @@ function drawParameters() {
   var p = parameters;
   CONTROLS.querySelector('input[name="initial-machines"]').value = p.initialMachines;
   CONTROLS.querySelector('input[name="initial-items"]').value    = p.initialItems;
-  CONTROLS.querySelector('input[name="simulation-speed"]').value = p.simulationSpeed;
-  CONTROLS.querySelector('input[name="machine-capacity"]').value = p.machineCapacity;
   CONTROLS.querySelector('input[name="virtual-nodes"]').value    = p.virtualNodes;
-  CONTROLS.querySelector('input[name="item-additions"]').value   = p.itemAdditions;
-  CONTROLS.querySelector('input[name="item-removals"]').value    = p.itemRemovals;
   CONTROLS.querySelector('input[name="click-additions"]').value  = p.clickAdditions;
   CONTROLS.querySelector('input[name="click-removals"]').value   = p.clickRemovals;
 }
