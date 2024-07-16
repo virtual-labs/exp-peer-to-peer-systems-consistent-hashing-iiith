@@ -6,7 +6,7 @@ const CONTROLS          = document.querySelector('#controls form');
 const START_SIMULATION  = document.querySelector('#start-simulation');
 const STOP_SIMULATION   = document.querySelector('#stop-simulation');
 const ITEMS_PLOT        = document.querySelector('#items-plot');
-const MIGRATED_PLOT     = document.querySelector('#migrated-plot');
+const MIGRATIONS_PLOT   = document.querySelector('#migrations-plot');
 const START_AUDIO       = document.querySelector('#start-audio');
 const STOP_AUDIO        = document.querySelector('#stop-audio');
 const PAUSE_AUDIO       = document.querySelector('#pause-audio');
@@ -90,19 +90,20 @@ class Item {
     this.speed  = speed;
     this.state  = 0;
     this.owner  = '';
-    this.target = '';
+    this.source = '';
   }
 }
 
 
 /** Defines a consistent hash ring in the simulation. */
 class ConsistentHashRing {
-  constructor() {
-    this.itemMap    = new Map();
-    this.machineMap = new Map();
-    this.ring       = [];
-    this.items      = [];
-    this.machines   = [];
+  constructor(onMigration) {
+    this.itemMap     = new Map();
+    this.machineMap  = new Map();
+    this.ring        = [];
+    this.items       = [];
+    this.machines    = [];
+    this.onMigration = onMigration || identity;
   }
 
   /** Reset the hash ring. */
@@ -355,6 +356,8 @@ class ConsistentHashRing {
     var m = this.findLaterMachine(o.hash);
     o.owner = m.name;
     m.items += 1;
+    // Notify of migration, if necessary.
+    if (o.source && o.source !== m.name) this.onMigration(o, o.source, m.name);
   }
 
   /** Detach an item from the hash ring. */
@@ -369,7 +372,7 @@ class ConsistentHashRing {
   /** Prepare an item to migrate to a machine. */
   migrateItem(o, m) {
     if (o.owner === m.name) return;
-    o.target = m.name;
+    o.source = o.owner;
     o.type   = MIGRATING_OUT;
   }
 
@@ -397,13 +400,17 @@ var simulation = {
   time: 0,
   lastMachine: 0,
   lastItem: 0,
+  migrations: new Map(),
 };
 
 /** Consistent hash ring for the simulation. */
-var hashring = new ConsistentHashRing();
+var hashring = new ConsistentHashRing(handleMigration);
 
 /** Plot of items vs machines. */
 var itemsPlot = null;
+
+/** Plot of migrations vs machines. */
+var migrationsPlot = null;
 
 /** Plot of migrated items vs machines. */
 var migratedPlot = null;
@@ -446,6 +453,7 @@ function simulationLoop(timestamp) {
 }
 
 
+/** Update the simulation state. */
 function updateSimulation(timestamp) {
   var s = simulation;
   var p = parameters;
@@ -454,6 +462,16 @@ function updateSimulation(timestamp) {
   s.timestamp = timestamp;
   s.time     += dt;
   hashring.update(dt);
+}
+
+
+/** Count number of items migrated to/from each machine. */
+function handleMigration(o, l, m) {
+  var s = simulation;
+  var lname = baseMachineName(l);
+  var mname = baseMachineName(m);
+  s.migrations.set(lname, (s.migrations.get(lname) || 0) + 1);
+  s.migrations.set(mname, (s.migrations.get(mname) || 0) + 1);
 }
 
 
@@ -584,6 +602,7 @@ function resetSimulation() {
   s.time      = 0;
   s.lastMachine = 0;
   s.lastItem    = 0;
+  s.migrations.clear();
   h.reset();
 }
 
@@ -655,6 +674,7 @@ function drawButtons() {
 /** Draw the plots for the simulation. */
 function drawPlots() {
   drawItemsPlot();
+  drawMigrationsPlot();
 }
 
 
@@ -682,7 +702,7 @@ function drawItemsPlot() {
     },
     options: {
       scales: {
-        x: {title: {display: true, text: 'Machine'}},
+        // x: {title: {display: true, text: 'Machine'}},
         y: {title: {display: true, text: 'Item count'}, beginAtZero: true},
       }
     }
@@ -690,6 +710,35 @@ function drawItemsPlot() {
   itemsPlot.data.labels = labels;
   itemsPlot.data.datasets[0].data = records;
   itemsPlot.update();
+}
+
+
+/** Draw the migrations plot. */
+function drawMigrationsPlot() {
+  var s = simulation;
+  var labels  = [...s.migrations.keys()];
+  var records = [...s.migrations.values()];
+  migrationsPlot = migrationsPlot || new Chart(MIGRATIONS_PLOT, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Machine',
+        data: records,
+        backgroundColor: 'rgba(25, 99, 132, 1)',
+        borderColor: 'rgba(25, 99, 132, 1)',
+      }]
+    },
+    options: {
+      scales: {
+        // x: {title: {display: true, text: 'Machine'}},
+        y: {title: {display: true, text: 'Migration count (to / from)'}, beginAtZero: true},
+      }
+    }
+  });
+  migrationsPlot.data.labels = labels;
+  migrationsPlot.data.datasets[0].data = records;
+  migrationsPlot.update();
 }
 
 
@@ -780,6 +829,13 @@ function partition(x, ft) {
 /** Find the remainder of x/y with +ve sign (euclidean division). */
 function mod(x, y) {
   return x - y * Math.floor(x / y);
+}
+
+
+/** Identity function. */
+function identity(x) {
+  return x;
+
 }
 
 

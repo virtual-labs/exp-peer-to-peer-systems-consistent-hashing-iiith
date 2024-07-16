@@ -17,8 +17,12 @@ body {
 }
 
 
-/* Plot showing round-trip time vs time offset. */
-#items-plot {
+/* Plot details. */
+#items-plot, #migrations-plot {
   max-width: 100%;
   max-height: 40rem;
+  margin: 2rem 0;
+}
+#plots {
+  margin: 4rem 0;
 }
