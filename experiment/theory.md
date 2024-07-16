@@ -69,21 +69,6 @@ When a machine is added or removed, consistent hashing minimizes the disruption:
 <br>
 
 
-#### Example
-
-1. **Adding Machine $M5$**:
-    - Before: $\{M1, M2, M3, M4\}$
-    - After: $\{M1, M2, M3, M4, M5\}$
-    - Only keys between $h(M4)$ and $h(M5)$ are reassigned.
-
-2. **Removing Machine $M2$**:
-    - Before: $\{M1, M2, M3, M4\}$
-    - After: $\{M1, M3, M4\}$
-    - Only keys between $h(M1)$ and $h(M3)$ are reassigned.
-
-<br>
-
-
 #### Applications of Consistent Hashing
 
 Consistent hashing is vital in various distributed systems, such as:
