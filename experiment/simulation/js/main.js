@@ -76,6 +76,7 @@ class Machine {
     this.speed = speed;
     this.state = state;
     this.items = 0;
+    this.migrations = 0;
   }
 }
 
@@ -93,6 +94,8 @@ class Item {
     this.source = '';
   }
 }
+
+
 
 
 /** Defines a consistent hash ring in the simulation. */
@@ -385,6 +388,114 @@ class ConsistentHashRing {
 
 
 
+/** Defines a naive hash ring in the simulation. */
+class NaiveHashRing {
+  constructor() {
+    this.machineMap = new Map();
+    this.machines   = [];
+    this.items      = [];
+  }
+
+
+  /** Reset the hash ring. */
+  reset() {
+    this.machineMap.clear();
+    this.machines.length = 0;
+    this.items.length = 0;
+  }
+
+
+  /** Add a machine to the hash ring. */
+  addMachine(name) {
+    if (this.machineMap.has(name)) return;
+    var hash = cyrb53(name);
+    var m = new Machine(name, hash, 1);
+    this.machineMap.set(name, m);
+    this.machines.push(m);
+    this.migrateItems();
+  }
+
+
+  /** Remove a machine from the hash ring. */
+  removeMachine(name) {
+    var m = this.getMachine(name);
+    if (!m) return;
+    this.machineMap.delete(name);
+    var i = this.machines.indexOf(m);
+    this.machines.splice(i, 1);
+    this.migrateItems();
+  }
+
+
+  /** Remove a random machine from the hash ring. */
+  removeRandomMachine() {
+    var N = this.machines.length;
+    if (N === 0) return;
+    var i = Math.floor(Math.random() * N);
+    var m = this.machines[i];
+    this.machineMap.delete(m.name);
+    this.machines.splice(i, 1);
+    this.migrateItems();
+  }
+
+
+  /** Add an item to the hash ring. */
+  addItem(name) {
+    var hash = cyrb53(name);
+    var o    = new Item(name, hash, 1);
+    this.items.push(o);
+    // Attach the item to the appropriate machine.
+    var i = Math.floor((hash / MAX_INT53) * this.machines.length);
+    var m = this.machines[i];
+    o.owner  = m.name;
+    m.items += 1;
+  }
+
+
+  /** Remove n random items from the hash ring. */
+  removeRandomItems(n) {
+    var N = this.items.length;
+    var n = Math.min(n, N);
+    // Randomly select n items to remove.
+    this.items.sort(() => Math.random() - 0.5);
+    for (var i=0; i<n; ++i) {
+      var o = this.items.pop();
+      var m = this.getMachine(o.owner);
+      m.items -= 1;
+    }
+  }
+
+
+  /** Migrate items in the hash ring. */
+  migrateItems() {
+    var N = this.items.length;
+    // Randomly select n items to migrate.
+    for (var i=0; i<N; ++i) {
+      var o = this.items[i];
+      var l = this.getMachine(o.owner);
+      // Attach the item to the appropriate machine.
+      var j = Math.floor((o.hash / MAX_INT53) * this.machines.length);
+      var m = this.machines[j];
+      if (o.owner !== m.name) {
+        l.migrations += 1;
+        m.migrations += 1;
+      }
+      o.owner  = m.name;
+      l.items -= 1;
+      m.items += 1;
+    }
+  }
+
+
+  /** Get a machine by name. */
+  getMachine(name) {
+    return this.machineMap.get(name);
+  }
+}
+
+
+
+
 // STATE
 // -----
 
@@ -405,6 +516,9 @@ var simulation = {
 
 /** Consistent hash ring for the simulation. */
 var hashring = new ConsistentHashRing(handleMigration);
+
+/** Naive hash ring for the simulation. */
+var naivering = new NaiveHashRing();
 
 /** Plot of items vs machines. */
 var itemsPlot = null;
@@ -521,12 +635,14 @@ function onClearPlots() {
 /** Called when "Add Machine" button is clicked. */
 function onAddMachine() {
   var h = hashring;
+  var n = naivering;
   var s = simulation;
   var p = parameters;
   var el   = document.querySelector('input[name="add-machine-name"]');;
   var name = baseMachineName(el.value) || 'm' + s.lastMachine; s.lastMachine++;
   for (var i=0; i<p.virtualNodes; ++i)
     h.addMachine(name + '.' + i);
+  n.addMachine(name);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
@@ -534,11 +650,13 @@ function onAddMachine() {
 /** Called when "Remove Machine" button is clicked. */
 function onRemoveMachine() {
   var h  = hashring;
+  var n  = naivering;
   var p  = parameters;
   var el = document.querySelector('input[name="remove-machine-name"]');
   var name = baseMachineName(el.value || h.getRandomMachine().name);
   for (var i=0; i<p.virtualNodes; ++i)
     h.removeMachine(name + '.' + i);
+  n.removeMachine(name);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
@@ -546,11 +664,13 @@ function onRemoveMachine() {
 /** Called when "Add Items" button is clicked. */
 function onAddItems() {
   var h = hashring;
+  var n = naivering;
   var p = parameters;
   var s = simulation;
   for (var i=0; i<p.clickAdditions; ++i, ++s.lastItem) {
     var name = 'o' + s.lastItem;
     h.addItem(name);
+    n.addItem(name);
   }
   playAudio(SYNCHRONIZE_AUDIO);
 }
@@ -559,8 +679,10 @@ function onAddItems() {
 /** Called when "Remove Items" button is clicked. */
 function onRemoveItems() {
   var h = hashring;
+  var n = naivering;
   var p = parameters;
   h.removeRandomItems(p.clickRemovals);
+  n.removeRandomItems(p.clickRemovals);
   playAudio(SYNCHRONIZE_AUDIO);
 }
 
@@ -576,6 +698,7 @@ function stopSimulation() {
 /** Initialize the simulation. */
 function initSimulation() {
   var h = hashring;
+  var n = naivering;
   var p = parameters;
   var s = simulation;
   resetSimulation();
@@ -584,16 +707,20 @@ function initSimulation() {
     var name = 'm' + i;
     for (var j=0; j<p.virtualNodes; ++j)
       h.addMachineImmediate(name + '.' + j);
+    n.addMachine(name);
   }
   // Add initial items.
-  for (var i=0; i<p.initialItems; ++i)
+  for (var i=0; i<p.initialItems; ++i) {
     h.addItem('o' + i);
+    n.addItem('o' + i);
+  }
 }
 
 
 /** Reset the simulation. */
 function resetSimulation() {
   var h = hashring;
+  var n = naivering;
   var s = simulation;
   s.isRunning = false;
   s.isPaused  = false;
@@ -604,6 +731,7 @@ function resetSimulation() {
   s.lastItem    = 0;
   s.migrations.clear();
   h.reset();
+  n.reset();
 }
 
 
@@ -683,61 +811,69 @@ function drawItemsPlot() {
   var h = hashring;
   var counts = new Map();
   for (var m of h.machines) {
-    var name = baseMachineName(m.name);
-    var n    = counts.get(name) || 0;
+    let name = baseMachineName(m.name);
+    let n    = counts.get(name) || 0;
     counts.set(name, n + m.items);
   }
   var labels  = [...counts.keys()];
-  var records = [...counts.values()];
+  var hvalues = [...counts.values()];
   itemsPlot = itemsPlot || new Chart(ITEMS_PLOT, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
-        label: 'Machine',
-        data: records,
+        label: 'Consistent Hash',
+        data: hvalues,
         backgroundColor: 'rgba(25, 99, 132, 1)',
         borderColor: 'rgba(25, 99, 132, 1)',
       }]
     },
     options: {
       scales: {
-        // x: {title: {display: true, text: 'Machine'}},
+        x: {title: {display: true, text: 'Machine'}},
         y: {title: {display: true, text: 'Item count'}, beginAtZero: true},
       }
     }
   });
   itemsPlot.data.labels = labels;
-  itemsPlot.data.datasets[0].data = records;
+  itemsPlot.data.datasets[0].data = hvalues;
   itemsPlot.update();
 }
 
 
 /** Draw the migrations plot. */
 function drawMigrationsPlot() {
+  var n = naivering;
   var s = simulation;
-  var labels  = [...s.migrations.keys()];
-  var records = [...s.migrations.values()];
+  var labels  = n.machines.map(m => m.name);
+  var hvalues = labels.map(name => s.migrations.get(name) || 0);
+  var nvalues = n.machines.map(m => m.migrations)
   migrationsPlot = migrationsPlot || new Chart(MIGRATIONS_PLOT, {
     type: 'bar',
     data: {
       labels,
       datasets: [{
-        label: 'Machine',
-        data: records,
+        label: 'Naive Hash',
+        data: nvalues,
+        backgroundColor: 'rgba(125, 199, 132, 1)',
+        borderColor: 'rgba(25, 99, 132, 1)',
+      }, {
+        label: 'Consistent Hash',
+        data: hvalues,
         backgroundColor: 'rgba(25, 99, 132, 1)',
         borderColor: 'rgba(25, 99, 132, 1)',
       }]
     },
     options: {
       scales: {
-        // x: {title: {display: true, text: 'Machine'}},
+        x: {title: {display: true, text: 'Machine'}},
         y: {title: {display: true, text: 'Migration count (to / from)'}, beginAtZero: true},
       }
     }
   });
   migrationsPlot.data.labels = labels;
-  migrationsPlot.data.datasets[0].data = records;
+  migrationsPlot.data.datasets[0].data = nvalues;
+  migrationsPlot.data.datasets[1].data = hvalues;
   migrationsPlot.update();
 }
 
