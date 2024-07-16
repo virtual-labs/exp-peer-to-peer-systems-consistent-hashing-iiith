@@ -74,7 +74,6 @@ class Machine {
     this.speed = speed;
     this.state = state;
     this.items = 0;
-    this.migrations = 0;
   }
 }
 
@@ -388,10 +387,11 @@ class ConsistentHashRing {
 
 /** Defines a naive hash ring in the simulation. */
 class NaiveHashRing {
-  constructor() {
-    this.machineMap = new Map();
-    this.machines   = [];
-    this.items      = [];
+  constructor(onMigration) {
+    this.machineMap  = new Map();
+    this.machines    = [];
+    this.items       = [];
+    this.onMigration = onMigration || identity;
   }
 
 
@@ -474,12 +474,9 @@ class NaiveHashRing {
       // Attach the item to the appropriate machine.
       var j = Math.floor((o.hash / MAX_INT53) * this.machines.length);
       var m = this.machines[j];
-      if (o.owner !== m.name) {
-        l.migrations += 1;
-        m.migrations += 1;
-      }
+      if (o.owner !== m.name) this.onMigration(o, o.owner, m.name);
       o.owner  = m.name;
-      l.items -= 1;
+      if (l) l.items -= 1;
       m.items += 1;
     }
   }
@@ -509,14 +506,15 @@ var simulation = {
   time: 0,
   lastMachine: 0,
   lastItem: 0,
-  migrations: new Map(),
 };
 
 /** Consistent hash ring for the simulation. */
-var hashring = new ConsistentHashRing(handleMigration);
+var hashring = new ConsistentHashRing(handleHashringMigration);
+var hashringMigrations = new Map();
 
 /** Naive hash ring for the simulation. */
-var naivering = new NaiveHashRing();
+var naivering = new NaiveHashRing(handleNaiveringMigration);
+var naiveringMigrations = new Map();
 
 /** Plot of items vs machines. */
 var itemsPlot = null;
@@ -574,13 +572,21 @@ function updateSimulation(timestamp) {
 }
 
 
-/** Count number of items migrated to/from each machine. */
-function handleMigration(o, l, m) {
-  var s = simulation;
-  var lname = baseMachineName(l);
-  var mname = baseMachineName(m);
-  s.migrations.set(lname, (s.migrations.get(lname) || 0) + 1);
-  s.migrations.set(mname, (s.migrations.get(mname) || 0) + 1);
+/** Count number of items migrated to/from each machine, on the consistent hash ring. */
+function handleHashringMigration(o, lname, mname) {
+  var hm = hashringMigrations;
+  lname  = baseMachineName(lname);
+  mname  = baseMachineName(mname);
+  hm.set(lname, (hm.get(lname) || 0) + 1);
+  hm.set(mname, (hm.get(mname) || 0) + 1);
+}
+
+
+/** Count number of items migrated to/from each machine, on the naive hash ring. */
+function handleNaiveringMigration(o, lname, mname) {
+  var nm = naiveringMigrations;
+  nm.set(lname, (nm.get(lname) || 0) + 1);
+  nm.set(mname, (nm.get(mname) || 0) + 1);
 }
 
 
@@ -731,9 +737,11 @@ function initSimulation() {
 
 /** Reset the simulation. */
 function resetSimulation() {
-  var h = hashring;
-  var n = naivering;
-  var s = simulation;
+  var h  = hashring;
+  var n  = naivering;
+  var s  = simulation;
+  var hm = hashringMigrations;
+  var nm = naiveringMigrations;
   s.isRunning = false;
   s.isPaused  = false;
   s.isResumed = true;
@@ -741,7 +749,8 @@ function resetSimulation() {
   s.time      = 0;
   s.lastMachine = 0;
   s.lastItem    = 0;
-  s.migrations.clear();
+  hm.clear();
+  nm.clear();
   h.reset();
   n.reset();
 }
@@ -847,11 +856,11 @@ function drawItemsPlot() {
 
 /** Draw the migrations plot. */
 function drawMigrationsPlot() {
-  var n = naivering;
-  var s = simulation;
-  var labels  = n.machines.map(m => m.name);
-  var hvalues = labels.map(name => s.migrations.get(name) || 0);
-  var nvalues = n.machines.map(m => m.migrations)
+  var hm = hashringMigrations;
+  var nm = naiveringMigrations;
+  var labels  = [...nm.keys()];
+  var hvalues = labels.map(k => hm.get(k) || 0);
+  var nvalues = labels.map(k => nm.get(k) || 0);
   migrationsPlot = migrationsPlot || new Chart(MIGRATIONS_PLOT, {
     type: 'bar',
     data: {
