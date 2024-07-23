@@ -22,14 +22,13 @@ const HASHRING_COLOR    = 'black';
 const HASHRING_WIDTH    = SIMULATION.width / 400;
 const MACHINE_COLOR     = 'orange';
 const MACHINE_WIDTH     = SIMULATION.width / 100;
-const ITEM_COLOR        = 'blue';
+const ITEM_COLOR        = 'darkseagreen';
 const ITEM_WIDTH        = SIMULATION.width / 200;
 const LEGEND_WIDTH      = SIMULATION.width / 5;
 const LEGEND_HEIGHT     = SIMULATION.width / 30;
 const MAIN_FONT         = '20px verdana';
 const TEXT_FONT         = '13px sans-serif';
 const TEXT_COLOR        = 'black';
-const CONTRAST_COLOR    = 'white';
 const MAX_INT53         = Math.pow(2, 53) - 1;
 const DIV_INT53         = 1 / MAX_INT53;
 
@@ -143,7 +142,12 @@ class ConsistentHashRing {
       var v = y + r * (1.1 - 0.1 * o.state) * Math.sin(a);
       var w = (2 - o.state) * ITEM_WIDTH;
       ctx.fillStyle = ITEM_COLOR;
-      ctx.fillRect(u-w, v-w, 2*w, 2*w);
+      if (o.isAttached) ctx.fillRect(u-w, v-w, 2*w, 2*w);
+      else {
+        ctx.fillRect(u-3*w, v-1.5*w, 6*w, 3*w);
+        ctx.fillStyle = TEXT_COLOR;
+        ctx.fillText(o.name, u, v);
+      }
     }
     // Draw the machines.
     for (var m of this.machines) {
@@ -806,7 +810,6 @@ function renderSimulation() {
   ctx.fillStyle = TEXT_COLOR;
   ctx.fillText('Consistent Hash Ring', HASHRING_X, 0.4 * HASHRING_Y);
   ctx.fillText('Machines: ' + h.attachedMachineCount() / p.virtualNodes, HASHRING_X, 0.5 * HASHRING_Y);
-  ctx.fillStyle = CONTRAST_COLOR;
   ctx.fillText('Items: '    + h.attachedItemCount(), HASHRING_X, 0.6 * HASHRING_Y);
   ctx.font = TEXT_FONT;
 }
