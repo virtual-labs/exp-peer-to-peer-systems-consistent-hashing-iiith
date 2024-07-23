@@ -142,9 +142,24 @@ class ConsistentHashRing {
       var v = y + r * (1.1 - 0.1 * o.state) * Math.sin(a);
       var w = (2 - o.state) * ITEM_WIDTH;
       ctx.fillStyle = ITEM_COLOR;
+      // Draw the item.
       if (o.isAttached) ctx.fillRect(u-w, v-w, 2*w, 2*w);
-      else {
-        ctx.fillRect(u-3*w, v-1.5*w, 6*w, 3*w);
+      else              ctx.fillRect(u-3*w, v-1.5*w, 6*w, 3*w);
+      // Draw item association.
+      if (o.isAttached && o.state < 1) {
+        var m  = this.machineMap.get(o.owner);
+        var ma = 2 * Math.PI * (m.hash * DIV_INT53);
+        var mu = x + r * (1.1 - 0.1 * m.state) * Math.cos(ma);
+        var mv = y + r * (1.1 - 0.1 * m.state) * Math.sin(ma);
+        ctx.strokeStyle = o.type === ATTACHING || o.type === MIGRATING_IN? 'green' : 'red';
+        ctx.lineWidth   = 2;
+        ctx.beginPath();
+        ctx.moveTo(u,  v);
+        ctx.lineTo(mu, mv);
+        ctx.stroke();
+      }
+      // Draw the item name.
+      if (!o.isAttached) {
         ctx.fillStyle = TEXT_COLOR;
         ctx.fillText(o.name, u, v);
       }
