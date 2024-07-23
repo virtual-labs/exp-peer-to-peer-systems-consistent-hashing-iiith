@@ -35,7 +35,7 @@
         <option value="2">2 virtual nodes per machine</option>
         <option value="4">4 virtual nodes per machine</option>
         <option value="8">8 virtual nodes per machine</option>
-        <option value="x">Custom</option>
+        <option value="x">Custom (no quiz)</option>
       </select>
       </div>
       <div fx col="1/2"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
@@ -59,6 +59,20 @@
 <!-- Plots and Parameters -->
 <section class="wide">
 <grid>
+  <div id="quiz" hidden>
+  <blockquote>
+  <form>
+    <div col="3/4">
+      <label>A possible quiz question appears here</label>
+      <input type="text" name="answer" placeholder="Type in your answer here">
+    </div>
+    <div col="1/4">
+      <div>.</div>
+      <button full id="submit-quiz" onclick="onSubmitQuiz()">Submit</button>
+    </div>
+  </form>
+  </blockquote>
+  </div>
   <grid id="plots">
     <div col="1/2"><canvas id="items-plot" width="320" height="320"></canvas></div>
     <div col="1/2"><canvas id="migrations-plot" width="320" height="320"></canvas></div>

@@ -3,6 +3,8 @@
 
 const SIMULATION        = document.querySelector('#simulation canvas');
 const BUTTONS_FORM      = document.querySelector('#buttons form');
+const QUIZ_DIV          = document.querySelector('#quiz');
+const QUIZ_FORM         = document.querySelector('#quiz form');
 const PARAMETERS_FORM   = document.querySelector('#parameters form');
 const SELECT_EXPERIMENT = document.querySelector('#select-experiment');
 const START_SIMULATION  = document.querySelector('#start-simulation');
@@ -24,6 +26,7 @@ const MACHINE_COLOR     = 'orange';
 const MACHINE_WIDTH     = SIMULATION.width / 100;
 const ITEM_COLOR        = 'darkseagreen';
 const ITEM_WIDTH        = SIMULATION.width / 200;
+const MARKING_COLOR     = 'red';
 const LEGEND_WIDTH      = SIMULATION.width / 5;
 const LEGEND_HEIGHT     = SIMULATION.width / 30;
 const MAIN_FONT         = '20px verdana';
@@ -44,6 +47,8 @@ const PARAMETERS = {
   initialMachines: 4,
   initialItems:    20,
   simulationSpeed: 10,
+  quizProbability: 0.05,
+  quizRetries:     3,
   // Machine parameters.
   virtualNodes:      1,
   machineUpdateTime: 10,
@@ -74,6 +79,7 @@ const MIGRATING_IN  = 5;
 class Machine {
   constructor(name, hash, speed, state=0) {
     this.isAttached = false;
+    this.isMarked   = false;
     this.name  = name;
     this.hash  = hash;
     this.type  = ATTACHING;
@@ -88,6 +94,7 @@ class Machine {
 class Item {
   constructor(name, hash, speed) {
     this.isAttached = false;
+    this.isMarked   = false;
     this.name   = name;
     this.hash   = hash;
     this.type   = ATTACHING;
@@ -143,10 +150,10 @@ class ConsistentHashRing {
       var w = (2 - o.state) * ITEM_WIDTH;
       ctx.fillStyle = ITEM_COLOR;
       // Draw the item.
-      if (o.isAttached) ctx.fillRect(u-w, v-w, 2*w, 2*w);
-      else              ctx.fillRect(u-3*w, v-1.5*w, 6*w, 3*w);
+      if (o.isAttached && !o.isMarked) ctx.fillRect(u-w, v-w, 2*w, 2*w);
+      else                             ctx.fillRect(u-3*w, v-1.5*w, 6*w, 3*w);
       // Draw item association.
-      if (o.isAttached && o.state < 1) {
+      if (o.isAttached && !o.isMarked && o.state < 1) {
         var m  = this.machineMap.get(o.owner);
         var ma = 2 * Math.PI * (m.hash * DIV_INT53);
         var mu = x + r * (1.1 - 0.1 * m.state) * Math.cos(ma);
@@ -159,9 +166,16 @@ class ConsistentHashRing {
         ctx.stroke();
       }
       // Draw the item name.
-      if (!o.isAttached) {
+      if (o.isMarked || !o.isAttached) {
         ctx.fillStyle = TEXT_COLOR;
         ctx.fillText(o.name, u, v);
+      }
+      // Draw markings.
+      if (o.isMarked) {
+        ctx.strokeStyle = MARKING_COLOR;
+        ctx.beginPath();
+        ctx.arc(u, v, 3*w, 0, 2 * Math.PI);
+        ctx.stroke();
       }
     }
     // Draw the machines.
@@ -174,6 +188,13 @@ class ConsistentHashRing {
       ctx.fillRect(u-3*w, v-w, 6*w, 2*w);
       ctx.fillStyle = TEXT_COLOR;
       ctx.fillText(m.name, u, v);
+      // Draw markings.
+      if (m.isMarked) {
+        ctx.stroke = MARKING_COLOR;
+        ctx.beginPath();
+        ctx.arc(u, v, 3*w, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
     }
   }
 
@@ -245,6 +266,8 @@ class ConsistentHashRing {
     // Now, attach the machine to the hash ring.
     this.ring.push(m);
     this.ring.sort((a, b) => a.hash - b.hash);
+    // Ask quiz question, if necessary.
+    this.attachMachineQuiz(m);
   }
 
   /** Detach a machine from the hash ring. */
@@ -265,6 +288,8 @@ class ConsistentHashRing {
       for (var o of this.items)
         if (o.hash > l.hash || o.hash <= m.hash) this.migrateItem(o, n);
     }
+    // Ask quiz question, if necessary.
+    this.detachMachineQuiz(m);
   }
 
   /** Get a machine by name. */
@@ -384,6 +409,8 @@ class ConsistentHashRing {
     m.items += 1;
     // Notify of migration, if necessary.
     if (o.source && o.source !== m.name) this.onMigration(o, o.source, m.name);
+    // Ask quiz question, if necessary.
+    this.attachItemQuiz(o);
   }
 
   /** Detach an item from the hash ring. */
@@ -393,6 +420,8 @@ class ConsistentHashRing {
     var m = this.getMachine(o.owner);
     o.owner = '';
     m.items -= 1;
+    // Ask quiz question, if necessary.
+    this.detachItemQuiz(o);
   }
 
   /** Prepare an item to migrate to a machine. */
@@ -405,6 +434,48 @@ class ConsistentHashRing {
   /** Get an item by name. */
   getItem(name) {
     return this.itemMap.get(name);
+  }
+
+  /** Ask a quiz question when a machine is attached. */
+  attachMachineQuiz(m) {
+    var s = simulation;
+    var p = parameters;
+    if (Math.random() > p.quizProbability) return;
+    var r = Math.floor(2 * Math.random());
+    m.isMarked = true;
+    s.quizHandler = () => { m.isMarked = false; };
+    if (r===0) askQuiz(`How many virtual nodes does machine ${baseMachineName(m.name)} have?`, p.virtualNodes);
+    else       askQuiz(`To which machine does the virtual node of ${m.name} belong?`, baseMachineName(m.name));
+  }
+
+  /** Ask a quiz question when a machine is detached. */
+  detachMachineQuiz(m) {
+    var s = simulation;
+    var p = parameters;
+    if (Math.random() > p.quizProbability) return;
+    m.isMarked = true;
+    s.quizHandler = () => { m.isMarked = false; };
+    askQuiz(`How many items were assigned to machine ${baseMachineName(m.name)}?`, `${m.items}`, m);
+  }
+
+  /** Ask a quiz question when an item is attached. */
+  attachItemQuiz(o) {
+    var s = simulation;
+    var p = parameters;
+    if (Math.random() > p.quizProbability) return;
+    o.isMarked = true;
+    s.quizHandler = () => { o.isMarked = false; };
+    askQuiz(`To which machine will item ${o.name} be assigned?`, baseMachineName(o.owner), o);
+  }
+
+  /** Ask a quiz question when an item is detached. */
+  detachItemQuiz(o) {
+    var s = simulation;
+    var p = parameters;
+    if (Math.random() > p.quizProbability) return;
+    o.isMarked = true;
+    s.quizHandler = () => { o.isMarked = false; };
+    askQuiz(`From which machine was item ${o.name} removed?`, baseMachineName(o.owner), o);
   }
 }
 
@@ -532,6 +603,10 @@ var simulation = {
   time: 0,
   lastMachine: 0,
   lastItem: 0,
+  quizFailed: 0,
+  quizQuestion: '',
+  quizAnswer: '',
+  quizHandler: null,
 };
 
 /** Consistent hash ring for the simulation. */
@@ -562,7 +637,9 @@ var images = {
 /** Main function. */
 function main() {
   Chart.register(ChartDataLabels);  // Enable chart data labels
-  BUTTONS_FORM.addEventListener('submit', onControls);
+  BUTTONS_FORM.addEventListener('submit', onFormSubmit);
+  QUIZ_FORM.addEventListener('submit', onFormSubmit);
+  PARAMETERS_FORM.addEventListener('submit', onFormSubmit);
   setTimeout(stopSimulation, 500);  // Let some rendering happen
   requestAnimationFrame(simulationLoop);
   drawButtons();
@@ -617,7 +694,7 @@ function handleNaiveringMigration(o, lname, mname) {
 
 
 /** Called when "Controls" form is submitted. */
-function onControls(e) {
+function onFormSubmit(e) {
   e.preventDefault();
   return false;
 }
@@ -731,6 +808,25 @@ function onRemoveItems() {
 }
 
 
+/** Pause the current simulation. */
+function pauseSimulation() {
+  var s = simulation;
+  s.isPaused = true;
+  s.isResumed = false;
+  drawButtons();
+}
+
+
+/** Resume the current simulation. */
+function resumeSimulation() {
+  var s = simulation;
+  s.isPaused = false;
+  s.isResumed = true;
+  requestAnimationFrame(simulationLoop);
+  drawButtons();
+}
+
+
 /** Stop the current simulation. */
 function stopSimulation() {
   resetSimulation();
@@ -791,6 +887,43 @@ function adjustParameters(fresh=false) {
   if (fresh) formNumber(data, 'virtual-nodes',    x => p.virtualNodes = x);
   formNumber(data, 'click-additions',  x => p.clickAdditions = x);
   formNumber(data, 'click-removals',   x => p.clickRemovals = x);
+}
+
+
+/** Ask a quiz question. */
+function askQuiz(question, answer) {
+  var s = simulation;
+  pauseSimulation();
+  s.quizQuestion = question;
+  s.quizAnswer   = answer;
+  QUIZ_FORM.querySelector('label').textContent = question;
+  QUIZ_FORM.querySelector('input[name="answer"]').value = '';
+  QUIZ_DIV.removeAttribute('hidden');
+}
+
+
+/** Called when "Submit Quiz" button is clicked. */
+function onSubmitQuiz() {
+  var s = simulation;
+  var p = parameters;
+  var answer = QUIZ_FORM.querySelector('input[name="answer"]').value;
+  if (answer === s.quizAnswer) {
+    s.quizFailed = 0;
+    if (s.quizHandler) s.quizHandler();
+    QUIZ_FORM.querySelector('label').textContent = `${s.quizQuestion} ✔️ (Correct)`;
+    playAudio(START_AUDIO);
+    setTimeout(() => {
+      QUIZ_DIV.setAttribute('hidden', '');
+      resumeSimulation();
+    }, 1000);
+  }
+  else {
+    s.quizFailed++;
+    var question = s.quizQuestion;
+    var label = s.quizFailed > p.quizRetries? `${question} (Answer: ${s.quizAnswer})` : `${question} ❌ (Try again)`;
+    QUIZ_FORM.querySelector('label').textContent = label;
+    playAudio(STOP_AUDIO);
+  }
 }
 
 

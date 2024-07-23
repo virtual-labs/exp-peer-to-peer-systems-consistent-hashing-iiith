@@ -23,6 +23,15 @@ section.wide {
 }
 
 
+/** Quiz. */
+#quiz {
+  background: #f9f9f9;
+}
+#quiz label {
+  font-weight: bold;
+}
+
+
 /* Plot details. */
 #items-plot, #migrations-plot {
   max-width: 100%;
