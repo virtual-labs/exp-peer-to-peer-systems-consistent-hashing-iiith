@@ -641,8 +641,8 @@ function onStopSimulation() {
 }
 
 
-/** Called when "Adjust Paramters" button is clicked. */
-function onAdjustParamters() {
+/** Called when "Adjust Parameters" button is clicked. */
+function onAdjustParameters() {
   playAudio(ADJUST_AUDIO);
   adjustParameters();
   drawParameters();
