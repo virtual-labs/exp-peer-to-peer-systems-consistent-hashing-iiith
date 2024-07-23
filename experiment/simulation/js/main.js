@@ -621,9 +621,9 @@ function onSelectExperiment() {
 
 /** Called when "Start Simulation" button is clicked. */
 function onStartSimulation() {
-  adjustParameters(true);
-  initSimulation();
   var s = simulation;
+  if (!s.isRunning) adjustParameters(true);
+  if (!s.isRunning) initSimulation();
   if (!s.isRunning) playAudio(START_AUDIO);
   else playAudio(PAUSE_AUDIO);
   s.isPaused  = s.isRunning? !s.isPaused : false;
