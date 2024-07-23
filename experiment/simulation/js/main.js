@@ -837,8 +837,8 @@ function drawItemsPlot() {
       datasets: [{
         label: 'Consistent Hash',
         data: hvalues,
-        backgroundColor: 'rgba(25, 99, 132, 1)',
-        borderColor: 'rgba(25, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 132, 132, 1)',
+        borderColor: 'rgba(255, 132, 132, 1)',
       }]
     },
     options: {
@@ -873,8 +873,8 @@ function drawMigrationsPlot() {
       }, {
         label: 'Consistent Hash',
         data: hvalues,
-        backgroundColor: 'rgba(25, 99, 132, 1)',
-        borderColor: 'rgba(25, 99, 132, 1)',
+        backgroundColor: 'rgba(255, 132, 132, 1)',
+        borderColor: 'rgba(255, 132, 132, 1)',
       }]
     },
     options: {
