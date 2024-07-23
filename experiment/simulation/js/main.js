@@ -727,6 +727,7 @@ function onStartSimulation() {
   s.isPaused  = s.isRunning? !s.isPaused : false;
   s.isResumed = !s.isPaused;
   s.isRunning = true;
+  if (s.isResumed) resetQuiz();
   requestAnimationFrame(simulationLoop);
   drawButtons();
 }
@@ -873,6 +874,10 @@ function resetSimulation() {
   s.time      = 0;
   s.lastMachine = 0;
   s.lastItem    = 0;
+  s.quizFailed   = 0;
+  s.quizQuestion = '';
+  s.quizAnswer   = '';
+  s.quizHandler  = null;
   hm.clear();
   nm.clear();
   h.reset();
@@ -883,7 +888,7 @@ function resetSimulation() {
 /** Adjust parameters based on form input. */
 function adjustParameters(fresh=false) {
   var p = parameters;
-  var data = new FormData(BUTTONS_FORM);
+  var data = new FormData(PARAMETERS_FORM);
   if (fresh) formNumber(data, 'initial-machines', x => p.initialMachines = x);
   if (fresh) formNumber(data, 'initial-items',    x => p.initialItems = x);
   if (fresh) formNumber(data, 'virtual-nodes',    x => p.virtualNodes = x);
@@ -894,6 +899,14 @@ function adjustParameters(fresh=false) {
 
 /** Hide the quiz form. */
 function resetQuiz() {
+  var s = simulation;
+  s.quizFailed   = 0;
+  s.quizQuestion = '';
+  s.quizAnswer   = '';
+  if (s.quizHandler) {
+    s.quizHandler();
+    s.quizHandler = null;
+  }
   QUIZ_DIV.setAttribute('hidden', '');
 }
 
@@ -917,7 +930,7 @@ function onSubmitQuiz() {
   var answer = QUIZ_FORM.querySelector('input[name="answer"]').value;
   if (answer === s.quizAnswer) {
     s.quizFailed = 0;
-    if (s.quizHandler) s.quizHandler();
+    if (s.quizHandler) { s.quizHandler(); s.quizHandler = null; }
     QUIZ_FORM.querySelector('label').textContent = `${s.quizQuestion} ✔️ (Correct)`;
     playAudio(START_AUDIO);
     setTimeout(() => {
