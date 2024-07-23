@@ -417,11 +417,12 @@ class ConsistentHashRing {
   detachItem(o) {
     if (!o.isAttached) return;
     o.isAttached = false;
+    // Ask quiz question, if necessary.
+    this.detachItemQuiz(o);
+    // Detach the item from the hash ring.
     var m = this.getMachine(o.owner);
     o.owner = '';
     m.items -= 1;
-    // Ask quiz question, if necessary.
-    this.detachItemQuiz(o);
   }
 
   /** Prepare an item to migrate to a machine. */
