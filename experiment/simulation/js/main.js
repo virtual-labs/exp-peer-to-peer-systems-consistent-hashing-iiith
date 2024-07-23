@@ -14,15 +14,21 @@ const PAUSE_AUDIO       = document.querySelector('#pause-audio');
 const ADJUST_AUDIO      = document.querySelector('#adjust-audio');
 const SYNCHRONIZE_AUDIO = document.querySelector('#synchronize-audio');
 
-const HASHRING_X        = SIMULATION.width / 2;
+const HASHRING_X        = SIMULATION.width  / 2;
 const HASHRING_Y        = SIMULATION.height / 2;
 const HASHRING_RADIUS   = 0.45 * Math.min(SIMULATION.width, SIMULATION.height);
 const HASHRING_COLOR    = 'black';
-const HASHRING_WIDTH    = 2;
+const HASHRING_WIDTH    = SIMULATION.width / 400;
 const MACHINE_COLOR     = 'orange';
-const MACHINE_WIDTH     = 8;
+const MACHINE_WIDTH     = SIMULATION.width / 100;
 const ITEM_COLOR        = 'blue';
-const ITEM_WIDTH        = 2;
+const ITEM_WIDTH        = SIMULATION.width / 200;
+const LEGEND_WIDTH      = SIMULATION.width / 5;
+const LEGEND_HEIGHT     = SIMULATION.width / 30;
+const MAIN_FONT         = '20px verdana';
+const TEXT_FONT         = '13px sans-serif';
+const TEXT_COLOR        = 'black';
+const CONTRAST_COLOR    = 'white';
 const MAX_INT53         = Math.pow(2, 53) - 1;
 const DIV_INT53         = 1 / MAX_INT53;
 
@@ -145,8 +151,8 @@ class ConsistentHashRing {
       var v = y + r * (1.1 - 0.1 * m.state) * Math.sin(a);
       var w = (2 - m.state) * MACHINE_WIDTH;
       ctx.fillStyle = MACHINE_COLOR;
-      ctx.fillRect(u-w, v-w, 2*w, 2*w);
-      ctx.fillStyle = 'black';
+      ctx.fillRect(u-3*w, v-w, 6*w, 2*w);
+      ctx.fillStyle = TEXT_COLOR;
       ctx.fillText(m.name, u, v);
     }
   }
@@ -786,15 +792,22 @@ function renderSimulation() {
   var p = parameters;
   if (!i.isLoaded) loadImages();
   var ctx  = SIMULATION.getContext('2d');
-  ctx.font = '13px sans-serif';
+  ctx.font = TEXT_FONT;
   ctx.textAlign    = 'center';
   ctx.textBaseline = 'middle';
   drawBackground(ctx);
   hashring.draw(ctx, HASHRING_X, HASHRING_Y, HASHRING_RADIUS);
-  ctx.fillStyle = 'black';
+  ctx.fillStyle = MACHINE_COLOR;
+  ctx.fillRect(HASHRING_X - 0.5*LEGEND_WIDTH, 0.5*HASHRING_Y - 0.5*LEGEND_HEIGHT, LEGEND_WIDTH, LEGEND_HEIGHT);
+  ctx.fillStyle = ITEM_COLOR;
+  ctx.fillRect(HASHRING_X - 0.5*LEGEND_WIDTH, 0.6*HASHRING_Y - 0.5*LEGEND_HEIGHT, LEGEND_WIDTH, LEGEND_HEIGHT);
+  ctx.font = MAIN_FONT;
+  ctx.fillStyle = TEXT_COLOR;
   ctx.fillText('Consistent Hash Ring', HASHRING_X, 0.4 * HASHRING_Y);
   ctx.fillText('Machines: ' + h.attachedMachineCount() / p.virtualNodes, HASHRING_X, 0.5 * HASHRING_Y);
+  ctx.fillStyle = CONTRAST_COLOR;
   ctx.fillText('Items: '    + h.attachedItemCount(), HASHRING_X, 0.6 * HASHRING_Y);
+  ctx.font = TEXT_FONT;
 }
 
 
