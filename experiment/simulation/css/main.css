@@ -2,6 +2,9 @@
 body {
   margin: 0;
 }
+section.wide {
+  margin: 0 8rem;
+}
 
 
 /* Simulation environment. */
@@ -12,6 +15,9 @@ body {
 
 
 /** Controls. */
+#buttons form {
+  margin-top: 6rem;
+}
 #buttons select {
   margin-top: 0;
 }

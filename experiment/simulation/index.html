@@ -10,22 +10,25 @@
 <title>Consistent Hashing Simulation</title>
 </head>
 <body>
-<!-- Simulation Environment -->
-<section id="simulation">
-  <canvas id="arena" width="1024" height="480"></canvas>
-  <audio id="start-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Startup.mp3"></audio>
-  <audio id="stop-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Shutdown.mp3"></audio>
-  <audio id="pause-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/notify.mp3"></audio>
-  <audio id="adjust-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/chimes.mp3"></audio>
-  <audio id="synchronize-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Logon%20Sound.mp3"></audio>
-</div>
 
-<!-- Controls -->
-<section id="controls">
-<form>
-  <div id="buttons">
+<!-- Simulation and Controls -->
+<section class="wide">
+<grid>
+  <!-- Simulation Environment -->
+  <div id="simulation" col="1/2">
+    <canvas id="arena" width="800" height="600"></canvas>
+    <audio id="start-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Startup.mp3"></audio>
+    <audio id="stop-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Shutdown.mp3"></audio>
+    <audio id="pause-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/notify.mp3"></audio>
+    <audio id="adjust-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/chimes.mp3"></audio>
+    <audio id="synchronize-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Logon%20Sound.mp3"></audio>
+  </div>
+
+  <!-- Controls -->
+  <div id="buttons" col="1/2">
+    <form>
     <grid>
-      <div col="2/4">
+      <div fx col="1/1">
       <select id="select-experiment" onchange="onSelectExperiment()">
         <option disabled selected>Select an Experiment</option>
         <option value="1">No virtual nodes</option>
@@ -35,24 +38,33 @@
         <option value="x">Custom</option>
       </select>
       </div>
-      <div col="1/4"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
-      <div col="1/4"><button full id="stop-simulation" onclick="onStopSimulation()">Stop Simulation</button></div>
+      <div fx col="1/2"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
+      <div fx col="1/2"><button full id="stop-simulation" onclick="onStopSimulation()">Stop Simulation</button></div>
     </grid>
     <grid>
-      <div col="1/4"><input type="text" txt="c" name="add-machine-name" placeholder="Machine to add"></button></div>
-      <div col="1/4"><input type="text" txt="c" name="remove-machine-name" placeholder="Machine to remove"></button></div>
-      <div col="1/4"><button full id="adjust-parameters" onclick="onAdjustParameters()">Adjust Parameters</button></div>
-      <div col="1/4"><button full id="reset-parameters" onclick="onResetParameters()">Reset Parameters</button></div>
-      <div col="1/4"><button full id="add-machine" onclick="onAddMachine()">Add Machine</button></div>
-      <div col="1/4"><button full id="remove-machine" onclick="onRemoveMachine()">Remove Machine</button></div>
-      <div col="1/4"><button full id="add-items" onclick="onAddItems()">Add Items</button></div>
-      <div col="1/4"><button full id="remove-items" onclick="onRemoveItems()">Remove Items</button></div>
+      <div fx col="1/2"><input type="text" txt="c" name="add-machine-name" placeholder="Machine to add"></button></div>
+      <div fx col="1/2"><input type="text" txt="c" name="remove-machine-name" placeholder="Machine to remove"></button></div>
+      <div fx col="1/2"><button full id="add-machine" onclick="onAddMachine()">Add Machine</button></div>
+      <div fx col="1/2"><button full id="remove-machine" onclick="onRemoveMachine()">Remove Machine</button></div>
+      <div fx col="1/2"><button full id="add-items" onclick="onAddItems()">Add Items</button></div>
+      <div fx col="1/2"><button full id="remove-items" onclick="onRemoveItems()">Remove Items</button></div>
+      <div fx col="1/2"><button full id="adjust-parameters" onclick="onAdjustParameters()">Adjust Parameters</button></div>
+      <div fx col="1/2"><button full id="reset-parameters" onclick="onResetParameters()">Reset Parameters</button></div>
     </grid>
+    </form>
   </div>
-  <div id="plots">
-    <div><canvas id="items-plot" width="320" height="320"></canvas></div>
-    <div><canvas id="migrations-plot" width="320" height="320"></canvas></div>
-  </div>
+</grid>
+</section>
+
+<!-- Plots and Parameters -->
+<section class="wide">
+<grid>
+  <grid id="plots">
+    <div col="1/2"><canvas id="items-plot" width="320" height="320"></canvas></div>
+    <div col="1/2"><canvas id="migrations-plot" width="320" height="320"></canvas></div>
+  </grid>
+  <div id="parameters">
+  <form>
   <grid>
     <div col="1/2">
       <h4>Simulation Parameters</h4>
@@ -65,27 +77,29 @@
       <input type="number" name="initial-items" placeholder="20">
     </div>
     <div col="1/2">
-			<h4>Machine Parameters</h4>
-			<label>Virtual nodes per machine</label>
-			<input type="number" name="virtual-nodes" placeholder="1">
-		</div>
-		<div col="1/2">
-			<h4>...</h4>
-		</div>
+      <h4>Machine Parameters</h4>
+      <label>Virtual nodes per machine</label>
+      <input type="number" name="virtual-nodes" placeholder="1">
+    </div>
     <div col="1/2">
-			<h4>Item Parameters</h4>
-			<label>Items to add on click</label>
-			<input type="number" name="click-additions" placeholder="10">
-		</div>
-		<div col="1/2">
-			<h4>...</h4>
-			<label>Items to remove on click</label>
-			<input type="number" name="click-removals" placeholder="10">
-		</div>
+      <h4>...</h4>
+    </div>
+    <div col="1/2">
+      <h4>Item Parameters</h4>
+      <label>Items to add on click</label>
+      <input type="number" name="click-additions" placeholder="10">
+    </div>
+    <div col="1/2">
+      <h4>...</h4>
+      <label>Items to remove on click</label>
+      <input type="number" name="click-removals" placeholder="10">
+    </div>
   </grid>
-</form>
+  </form>
+  </div>
+  </div>
+</grid>
 </section>
-</div>
 
 <script src="./js/main.js"></script>
 </body>

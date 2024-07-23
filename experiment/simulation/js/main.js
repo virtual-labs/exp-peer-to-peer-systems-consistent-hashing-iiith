@@ -2,7 +2,7 @@
 // ---------
 
 const SIMULATION        = document.querySelector('#simulation canvas');
-const CONTROLS          = document.querySelector('#controls form');
+const BUTTONS           = document.querySelector('#buttons form');
 const SELECT_EXPERIMENT = document.querySelector('#select-experiment');
 const START_SIMULATION  = document.querySelector('#start-simulation');
 const STOP_SIMULATION   = document.querySelector('#stop-simulation');
@@ -536,7 +536,7 @@ var images = {
 /** Main function. */
 function main() {
   Chart.register(ChartDataLabels);  // Enable chart data labels
-  CONTROLS.addEventListener('submit', onControls);
+  BUTTONS.addEventListener('submit', onControls);
   setTimeout(stopSimulation, 500);  // Let some rendering happen
   requestAnimationFrame(simulationLoop);
   drawButtons();
@@ -759,7 +759,7 @@ function resetSimulation() {
 /** Adjust parameters based on form input. */
 function adjustParameters(fresh=false) {
   var p = parameters;
-  var data = new FormData(CONTROLS);
+  var data = new FormData(BUTTONS);
   if (fresh) formNumber(data, 'initial-machines', x => p.initialMachines = x);
   if (fresh) formNumber(data, 'initial-items',    x => p.initialItems = x);
   if (fresh) formNumber(data, 'virtual-nodes',    x => p.virtualNodes = x);
@@ -771,11 +771,11 @@ function adjustParameters(fresh=false) {
 /** Update the paramter values in the form. */
 function drawParameters() {
   var p = parameters;
-  CONTROLS.querySelector('input[name="initial-machines"]').value = p.initialMachines;
-  CONTROLS.querySelector('input[name="initial-items"]').value    = p.initialItems;
-  CONTROLS.querySelector('input[name="virtual-nodes"]').value    = p.virtualNodes;
-  CONTROLS.querySelector('input[name="click-additions"]').value  = p.clickAdditions;
-  CONTROLS.querySelector('input[name="click-removals"]').value   = p.clickRemovals;
+  BUTTONS.querySelector('input[name="initial-machines"]').value = p.initialMachines;
+  BUTTONS.querySelector('input[name="initial-items"]').value    = p.initialItems;
+  BUTTONS.querySelector('input[name="virtual-nodes"]').value    = p.virtualNodes;
+  BUTTONS.querySelector('input[name="click-additions"]').value  = p.clickAdditions;
+  BUTTONS.querySelector('input[name="click-removals"]').value   = p.clickRemovals;
 }
 
 
