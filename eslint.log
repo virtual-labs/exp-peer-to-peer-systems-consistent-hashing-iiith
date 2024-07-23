@@ -1,0 +1,38 @@
+
+/home/runner/work/exp-consistent-hashing-iiith/exp-consistent-hashing-iiith/experiment/simulation/js/main.js
+    63:7   warning  'UNUSED' is assigned a value but never used     no-unused-vars
+   182:14  warning  'm' is already defined                          no-redeclare
+   183:11  warning  'a' is already defined                          no-redeclare
+   184:11  warning  'u' is already defined                          no-redeclare
+   185:11  warning  'v' is already defined                          no-redeclare
+   186:11  warning  'w' is already defined                          no-redeclare
+   242:11  warning  'm' is already defined                          no-redeclare
+   263:16  warning  'o' is already defined                          no-redeclare
+   288:16  warning  'o' is already defined                          no-redeclare
+   357:9   warning  'n' is already defined                          no-redeclare
+   379:11  warning  'o' is already defined                          no-redeclare
+   388:14  warning  'o' is already defined                          no-redeclare
+   395:14  warning  'o' is already defined                          no-redeclare
+   554:9   warning  'n' is already defined                          no-redeclare
+   640:3   warning  'Chart' is not defined                          no-undef
+   640:18  warning  'ChartDataLabels' is not defined                no-undef
+   705:10  warning  'onSelectExperiment' is defined but never used  no-unused-vars
+   721:10  warning  'onStartSimulation' is defined but never used   no-unused-vars
+   737:10  warning  'onStopSimulation' is defined but never used    no-unused-vars
+   744:10  warning  'onAdjustParameters' is defined but never used  no-unused-vars
+   752:10  warning  'onResetParameters' is defined but never used   no-unused-vars
+   759:10  warning  'onAddMachine' is defined but never used        no-unused-vars
+   764:71  warning  Unnecessary semicolon                           no-extra-semi
+   774:10  warning  'onRemoveMachine' is defined but never used     no-unused-vars
+   788:10  warning  'onAddItems' is defined but never used          no-unused-vars
+   803:10  warning  'onRemoveItems' is defined but never used       no-unused-vars
+   856:12  warning  'i' is already defined                          no-redeclare
+   927:10  warning  'onSubmitQuiz' is defined but never used        no-unused-vars
+  1019:32  warning  'Chart' is not defined                          no-undef
+  1050:42  warning  'Chart' is not defined                          no-undef
+  1081:10  warning  'getMousePos' is defined but never used         no-unused-vars
+  1100:10  warning  'loadImage' is defined but never used           no-unused-vars
+
+✖ 32 problems (0 errors, 32 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

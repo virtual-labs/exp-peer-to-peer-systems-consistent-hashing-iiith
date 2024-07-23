@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/barecss@1.1.1/css/bare.min.css">
+<link rel="stylesheet" href="./css/main.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+<title>Consistent Hashing Simulation</title>
+</head>
+<body>
+
+<!-- Simulation and Controls -->
+<section class="wide">
+<grid>
+  <!-- Simulation Environment -->
+  <div id="simulation" col="1/2">
+    <canvas id="arena" width="800" height="600"></canvas>
+    <audio id="start-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Startup.mp3"></audio>
+    <audio id="stop-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Shutdown.mp3"></audio>
+    <audio id="pause-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/notify.mp3"></audio>
+    <audio id="adjust-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/chimes.mp3"></audio>
+    <audio id="synchronize-audio" src="https://ia801000.us.archive.org/35/items/windowsxpstartup_201910/Windows%20XP%20Logon%20Sound.mp3"></audio>
+  </div>
+
+  <!-- Controls -->
+  <div id="buttons" col="1/2">
+    <form>
+    <grid>
+      <div fx col="1/1">
+      <select id="select-experiment" onchange="onSelectExperiment()">
+        <option disabled selected>Select an Experiment</option>
+        <option value="1">No virtual nodes</option>
+        <option value="2">2 virtual nodes per machine</option>
+        <option value="4">4 virtual nodes per machine</option>
+        <option value="8">8 virtual nodes per machine</option>
+        <option value="x">Custom (no quiz)</option>
+      </select>
+      </div>
+      <div fx col="1/2"><button full id="start-simulation" primary onclick="onStartSimulation()">Pause Simulation</button></div>
+      <div fx col="1/2"><button full id="stop-simulation" onclick="onStopSimulation()">Stop Simulation</button></div>
+    </grid>
+    <grid>
+      <div fx col="1/2"><input type="text" txt="c" name="add-machine-name" placeholder="Machine to add"></button></div>
+      <div fx col="1/2"><input type="text" txt="c" name="remove-machine-name" placeholder="Machine to remove"></button></div>
+      <div fx col="1/2"><button full id="add-machine" onclick="onAddMachine()">Add Machine</button></div>
+      <div fx col="1/2"><button full id="remove-machine" onclick="onRemoveMachine()">Remove Machine</button></div>
+      <div fx col="1/2"><button full id="add-items" onclick="onAddItems()">Add Items</button></div>
+      <div fx col="1/2"><button full id="remove-items" onclick="onRemoveItems()">Remove Items</button></div>
+      <div fx col="1/2"><button full id="adjust-parameters" onclick="onAdjustParameters()">Adjust Parameters</button></div>
+      <div fx col="1/2"><button full id="reset-parameters" onclick="onResetParameters()">Reset Parameters</button></div>
+    </grid>
+    </form>
+  </div>
+</grid>
+</section>
+
+<!-- Plots and Parameters -->
+<section class="wide">
+<grid>
+  <div id="quiz" hidden>
+  <blockquote>
+  <form>
+    <div col="3/4">
+      <label>A possible quiz question appears here</label>
+      <input type="text" name="answer" placeholder="Type in your answer here">
+    </div>
+    <div col="1/4">
+      <div>.</div>
+      <button full id="submit-quiz" onclick="onSubmitQuiz()">Submit</button>
+    </div>
+  </form>
+  </blockquote>
+  </div>
+  <grid id="plots">
+    <div col="1/2"><canvas id="items-plot" width="320" height="320"></canvas></div>
+    <div col="1/2"><canvas id="migrations-plot" width="320" height="320"></canvas></div>
+  </grid>
+  <div id="parameters">
+  <form>
+  <grid>
+    <div col="1/2">
+      <h4>Simulation Parameters</h4>
+      <label>Initial number of machines</label>
+      <input type="number" name="initial-machines" placeholder="4">
+    </div>
+    <div col="1/2">
+      <h4>...</h4>
+      <label>Initial number of items</label>
+      <input type="number" name="initial-items" placeholder="20">
+    </div>
+    <div col="1/2">
+      <h4>Machine Parameters</h4>
+      <label>Virtual nodes per machine</label>
+      <input type="number" name="virtual-nodes" placeholder="1">
+    </div>
+    <div col="1/2">
+      <h4>...</h4>
+    </div>
+    <div col="1/2">
+      <h4>Item Parameters</h4>
+      <label>Items to add on click</label>
+      <input type="number" name="click-additions" placeholder="10">
+    </div>
+    <div col="1/2">
+      <h4>...</h4>
+      <label>Items to remove on click</label>
+      <input type="number" name="click-removals" placeholder="10">
+    </div>
+  </grid>
+  </form>
+  </div>
+  </div>
+</grid>
+</section>
+
+<script src="./js/main.js"></script>
+<script src="../assets/js/iframeResize.js"></script></body>
+</html>

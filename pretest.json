@@ -1,0 +1,56 @@
+{
+  "version": 2.0,
+  "questions": [
+    {
+      "question": "What is a distributed hash table (DHT)?",
+      "answers": {
+        "a": "A single table stored in a single computer's memory",
+        "b": "A table of key-value pairs stored across multiple computers",
+        "c": "A table stored in a relational database",
+        "d": "A hash table with a fixed size"
+      },
+      "explanations": {
+        "a": "Incorrect. A DHT is distributed across multiple computers.",
+        "b": "Correct. A DHT stores key-value pairs across multiple computers.",
+        "c": "Incorrect. A DHT is not limited to relational databases.",
+        "d": "Incorrect. A DHT can vary in size."
+      },
+      "correctAnswer": "b",
+      "difficulty": "beginner"
+    },
+    {
+      "question": "How does naive hashing distribute key-value pairs across a cluster?",
+      "answers": {
+        "a": "By randomly selecting a machine",
+        "b": "By using the modulo operation on the hash of the key and the number of machines",
+        "c": "By storing all keys in a single machine",
+        "d": "By storing keys alphabetically across machines"
+      },
+      "explanations": {
+        "a": "Incorrect. Naive hashing is not random.",
+        "b": "Correct. Naive hashing uses the modulo operation.",
+        "c": "Incorrect. Naive hashing distributes keys across multiple machines.",
+        "d": "Incorrect. Keys are not stored alphabetically."
+      },
+      "correctAnswer": "b",
+      "difficulty": "beginner"
+    },
+    {
+      "question": "What is a major drawback of the naive hashing method when adding a new machine to the cluster?",
+      "answers": {
+        "a": "It increases the number of hash collisions",
+        "b": "It does not allow for even distribution of keys",
+        "c": "It requires recomputing the hash of all keys, leading to massive data movement",
+        "d": "It reduces the total storage capacity"
+      },
+      "explanations": {
+        "a": "Incorrect. Hash collisions are not the main issue.",
+        "b": "Incorrect. The distribution can still be even.",
+        "c": "Correct. Adding a machine requires recomputing hashes.",
+        "d": "Incorrect. Storage capacity is not reduced."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    }
+  ]
+}

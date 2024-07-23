@@ -1,0 +1,396 @@
+{
+  "version": 2.0,
+  "questions": [
+    {
+      "question": "What is the primary goal of consistent hashing in distributed systems?",
+      "answers": {
+        "a": "To ensure data security",
+        "b": "To simplify the hash function",
+        "c": "To maintain a balanced load with minimal data movement",
+        "d": "To increase the speed of data retrieval"
+      },
+      "explanations": {
+        "a": "Incorrect. Data security is not the main goal.",
+        "b": "Incorrect. Simplification is not the main goal.",
+        "c": "Correct. Balanced load and minimal movement are key.",
+        "d": "Incorrect. Speed is not the primary focus."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What is the primary disadvantage of using consistent hashing?",
+      "answers": {
+        "a": "It is computationally intensive",
+        "b": "It does not handle node failures well",
+        "c": "It requires more complex implementation",
+        "d": "It cannot handle large datasets"
+      },
+      "explanations": {
+        "a": "Incorrect. Computational intensity is not the primary issue.",
+        "b": "Incorrect. Consistent hashing handles node failures well.",
+        "c": "Correct. Implementation complexity is a disadvantage.",
+        "d": "Incorrect. It can handle large datasets."
+      },
+      "correctAnswer": "c",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "Consistent hashing is especially useful for which type of applications?",
+      "answers": {
+        "a": "Single-threaded applications",
+        "b": "Distributed systems with dynamic membership",
+        "c": "Local file systems",
+        "d": "Simple desktop applications"
+      },
+      "explanations": {
+        "a": "Incorrect. Single-threaded applications do not benefit much.",
+        "b": "Correct. It is very useful for distributed systems.",
+        "c": "Incorrect. Local file systems do not require consistent hashing.",
+        "d": "Incorrect. Desktop applications do not require it."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "Which of the following is a common use case for consistent hashing besides distributed caching?",
+      "answers": {
+        "a": "Load balancing in web servers",
+        "b": "Data replication in relational databases",
+        "c": "Session management in web applications",
+        "d": "Distributed logging"
+      },
+      "explanations": {
+        "a": "Incorrect. Load balancing is not the primary use case.",
+        "b": "Incorrect. Relational databases do not typically use consistent hashing.",
+        "c": "Incorrect. Session management is not a common use case.",
+        "d": "Correct. Distributed logging often uses consistent hashing."
+      },
+      "correctAnswer": "d",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "Why is the modulo operation not ideal for consistent hashing?",
+      "answers": {
+        "a": "It is computationally expensive",
+        "b": "It does not evenly distribute keys",
+        "c": "It causes significant data movement when nodes are added or removed",
+        "d": "It is not supported in many programming languages"
+      },
+      "explanations": {
+        "a": "Incorrect. Computational expense is not the main issue.",
+        "b": "Incorrect. Keys are usually evenly distributed.",
+        "c": "Correct. Modulo causes significant data movement.",
+        "d": "Incorrect. Modulo is widely supported."
+      },
+      "correctAnswer": "c",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "In consistent hashing, how are keys and machines represented?",
+      "answers": {
+        "a": "As points on a line",
+        "b": "As points on a 3D sphere",
+        "c": "As points on a circle",
+        "d": "As points on a grid"
+      },
+      "explanations": {
+        "a": "Incorrect. Consistent hashing uses a circular representation.",
+        "b": "Incorrect. It is not represented on a 3D sphere.",
+        "c": "Correct. Keys and machines are represented as points on a circle.",
+        "d": "Incorrect. A grid is not used in consistent hashing."
+      },
+      "correctAnswer": "c",
+      "difficulty": "beginner"
+    },
+    {
+      "question": "What is the role of a hash function in consistent hashing?",
+      "answers": {
+        "a": "To encrypt the data",
+        "b": "To map data to a position on the hash ring",
+        "c": "To manage network traffic",
+        "d": "To compress data"
+      },
+      "explanations": {
+        "a": "Incorrect. Hash functions do not encrypt data.",
+        "b": "Correct. They map data to a position on the hash ring.",
+        "c": "Incorrect. They do not manage network traffic.",
+        "d": "Incorrect. They do not compress data."
+      },
+      "correctAnswer": "b",
+      "difficulty": "beginner"
+    },
+    {
+      "question": "What is the range of the hash function in consistent hashing?",
+      "answers": {
+        "a": "[0, ∞)",
+        "b": "[-1, 1]",
+        "c": "[0, 1)",
+        "d": "[-1, ∞)"
+      },
+      "explanations": {
+        "a": "Incorrect. The range is not infinite.",
+        "b": "Incorrect. This range is too limited.",
+        "c": "Correct. The range is typically normalized to [0, 1).",
+        "d": "Incorrect. This range includes negative values."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "Why is MD5 often used in consistent hashing despite its cryptographic weaknesses?",
+      "answers": {
+        "a": "Because it is faster than other hash functions",
+        "b": "Because it provides better security",
+        "c": "Because it produces 64-bit hash values",
+        "d": "Because its collisions are predictable"
+      },
+      "explanations": {
+        "a": "Correct. MD5 is fast and sufficient for consistent hashing.",
+        "b": "Incorrect. MD5 is not secure.",
+        "c": "Incorrect. MD5 produces 128-bit hash values.",
+        "d": "Incorrect. Predictable collisions are a disadvantage."
+      },
+      "correctAnswer": "a",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "Why might Python's built-in `hash` function be unsuitable for consistent hashing?",
+      "answers": {
+        "a": "It is too slow",
+        "b": "It does not provide uniform distribution of keys",
+        "c": "It is not cryptographically secure",
+        "d": "It only works with integers"
+      },
+      "explanations": {
+        "a": "Incorrect. Speed is not the main issue.",
+        "b": "Correct. It does not ensure uniform distribution.",
+        "c": "Incorrect. Cryptographic security is not required.",
+        "d": "Incorrect. It works with more than just integers."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What is a another potential issue with using Python's built-in `hash` function?",
+      "answers": {
+        "a": "It is not uniform across different Python sessions",
+        "b": "It is slower than MD5",
+        "c": "It produces very large hash values",
+        "d": "It is cryptographically secure"
+      },
+      "explanations": {
+        "a": "Correct. The built-in hash function varies between sessions.",
+        "b": "Incorrect. Speed is not the main issue.",
+        "c": "Incorrect. Size of hash values is not the issue.",
+        "d": "Incorrect. Cryptographic security is not the concern."
+      },
+      "correctAnswer": "a",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "What happens to the distribution of key-value pairs when a new machine is added in consistent hashing?",
+      "answers": {
+        "a": "All key-value pairs are rehashed and redistributed",
+        "b": "Only the key-value pairs that map to the new machine's point need to be moved",
+        "c": "The distribution remains unchanged",
+        "d": "Key-value pairs are duplicated across all machines"
+      },
+      "explanations": {
+        "a": "Incorrect. Not all pairs are rehashed.",
+        "b": "Correct. Only pairs mapping to the new point are moved.",
+        "c": "Incorrect. The distribution changes slightly.",
+        "d": "Incorrect. Pairs are not duplicated across all machines."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What does the term 'virtual nodes' refer to in consistent hashing?",
+      "answers": {
+        "a": "A secondary set of nodes used for redundancy",
+        "b": "Multiple logical nodes mapped to a single physical node",
+        "c": "Nodes that do not store any data but manage metadata",
+        "d": "Temporary nodes used during data migration"
+      },
+      "explanations": {
+        "a": "Incorrect. Virtual nodes are not used for redundancy.",
+        "b": "Correct. They are multiple logical nodes mapped to a single physical node.",
+        "c": "Incorrect. They store actual data.",
+        "d": "Incorrect. They are not temporary."
+      },
+      "correctAnswer": "b",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "What is the purpose of using multiple points per server in consistent hashing?",
+      "answers": {
+        "a": "To increase the size of the hash space",
+        "b": "To improve the resolution of the hash function",
+        "c": "To distribute the load more evenly among servers",
+        "d": "To make the hash function more secure"
+      },
+      "explanations": {
+        "a": "Incorrect. The size of the hash space remains the same.",
+        "b": "Incorrect. Resolution is not the primary concern.",
+        "c": "Correct. Multiple points distribute the load more evenly.",
+        "d": "Incorrect. Security is not the main concern."
+      },
+      "correctAnswer": "c",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "In consistent hashing, what is the impact of using a high number of virtual nodes?",
+      "answers": {
+        "a": "Increased complexity in managing the system",
+        "b": "Decreased load balancing efficiency",
+        "c": "Improved load distribution and fault tolerance",
+        "d": "Reduced overall performance of the system"
+      },
+      "explanations": {
+        "a": "Incorrect. Complexity does not increase significantly.",
+        "b": "Incorrect. Load balancing efficiency improves.",
+        "c": "Correct. More virtual nodes improve load distribution and fault tolerance.",
+        "d": "Incorrect. Overall performance is not reduced."
+      },
+      "correctAnswer": "c",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "How does consistent hashing handle servers with different capacities?",
+      "answers": {
+        "a": "By assigning them a larger number of points on the circle",
+        "b": "By using a different hash function for each server",
+        "c": "By limiting the number of keys they can store",
+        "d": "By storing keys in a hierarchical structure"
+      },
+      "explanations": {
+        "a": "Correct. More points for higher capacity servers.",
+        "b": "Incorrect. The same hash function is used.",
+        "c": "Incorrect. Key limits are not used.",
+        "d": "Incorrect. Hierarchical structures are not used."
+      },
+      "correctAnswer": "a",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "What is a 'hot spot' in the context of distributed caching?",
+      "answers": {
+        "a": "A location where data is frequently accessed",
+        "b": "A node that has failed",
+        "c": "A region in the hash space with no data",
+        "d": "A backup server"
+      },
+      "explanations": {
+        "a": "Correct. A hot spot is a frequently accessed location.",
+        "b": "Incorrect. A failed node is not a hot spot.",
+        "c": "Incorrect. An empty hash space region is not a hot spot.",
+        "d": "Incorrect. A backup server is not a hot spot."
+      },
+      "correctAnswer": "a",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "How does consistent hashing handle a sudden increase in load on a particular node?",
+      "answers": {
+        "a": "By redistributing the load to all nodes evenly",
+        "b": "By assigning more virtual nodes to balance the load",
+        "c": "By shutting down the overloaded node temporarily",
+        "d": "By replicating data to neighboring nodes"
+      },
+      "explanations": {
+        "a": "Incorrect. Load is not redistributed evenly.",
+        "b": "Correct. More virtual nodes can help balance the load.",
+        "c": "Incorrect. Nodes are not shut down.",
+        "d": "Incorrect. Data replication is not the primary method."
+      },
+      "correctAnswer": "b",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "What aspect of consistent hashing helps mitigate the 'Thundering Herd' problem?",
+      "answers": {
+        "a": "By adding servers gradually and increasing their points over time",
+        "b": "By shutting down the system temporarily",
+        "c": "By using a different hash function for each server",
+        "d": "By duplicating all data across all servers"
+      },
+      "explanations": {
+        "a": "Correct. Gradual addition mitigates the Thundering Herd Problem.",
+        "b": "Incorrect. Shutting down the system is not practical.",
+        "c": "Incorrect. Different hash functions are not used.",
+        "d": "Incorrect. Data duplication is not a feasible solution."
+      },
+      "correctAnswer": "a",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "How does consistent hashing improve fault tolerance in distributed systems?",
+      "answers": {
+        "a": "By replicating data across multiple nodes",
+        "b": "By using stronger hash functions",
+        "c": "By reducing the number of nodes required",
+        "d": "By simplifying the system architecture"
+      },
+      "explanations": {
+        "a": "Correct. Replicating data improves fault tolerance.",
+        "b": "Incorrect. Hash function strength is not the key factor.",
+        "c": "Incorrect. The number of nodes is not reduced.",
+        "d": "Incorrect. System architecture simplification is not the key factor."
+      },
+      "correctAnswer": "a",
+      "difficulty": "advanced"
+    },
+    {
+      "question": "What is the typical effect of server failure in a consistent hashing system?",
+      "answers": {
+        "a": "All data on the failed server is lost",
+        "b": "The load is redistributed among the remaining servers",
+        "c": "The entire system crashes",
+        "d": "Only the failed server's data is inaccessible"
+      },
+      "explanations": {
+        "a": "Incorrect. Data is not necessarily lost.",
+        "b": "Correct. The load is redistributed.",
+        "c": "Incorrect. The entire system does not crash.",
+        "d": "Incorrect. Data is redistributed, not just inaccessible."
+      },
+      "correctAnswer": "b",
+      "difficulty": "beginner"
+    },
+    {
+      "question": "Which popular open-source caching system has integrated consistent hashing to manage distributed caching?",
+      "answers": {
+        "a": "Redis",
+        "b": "Memcached",
+        "c": "Varnish",
+        "d": "Squid"
+      },
+      "explanations": {
+        "a": "Incorrect. Redis is not the primary example.",
+        "b": "Correct. Memcached uses consistent hashing.",
+        "c": "Incorrect. Varnish is not the primary example.",
+        "d": "Incorrect. Squid is not the primary example."
+      },
+      "correctAnswer": "b",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What is the primary purpose of a distributed dictionary in the context of MapReduce?",
+      "answers": {
+        "a": "To store the intermediate and final key-value pairs generated by MapReduce jobs",
+        "b": "To store the source code of MapReduce jobs",
+        "c": "To manage user sessions in a web application",
+        "d": "To index web pages for search engines"
+      },
+      "explanations": {
+        "a": "Correct. A distributed dictionary stores intermediate and final key-value pairs.",
+        "b": "Incorrect. The source code is not stored in a distributed dictionary.",
+        "c": "Incorrect. Managing user sessions is not related to MapReduce.",
+        "d": "Incorrect. Indexing web pages is not the primary purpose."
+      },
+      "correctAnswer": "a",
+      "difficulty": "intermediate"
+    }
+  ]
+}
