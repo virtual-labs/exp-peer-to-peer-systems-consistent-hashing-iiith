@@ -190,7 +190,7 @@ class ConsistentHashRing {
       ctx.fillText(m.name, u, v);
       // Draw markings.
       if (m.isMarked) {
-        ctx.stroke = MARKING_COLOR;
+        ctx.strokeStyle = MARKING_COLOR;
         ctx.beginPath();
         ctx.arc(u, v, 3*w, 0, 2 * Math.PI);
         ctx.stroke();
@@ -709,7 +709,7 @@ function onSelectExperiment() {
     case '2': Object.assign(p, PARAMETERS, {virtualNodes: 2}); break;
     case '4': Object.assign(p, PARAMETERS, {virtualNodes: 4}); break;
     case '8': Object.assign(p, PARAMETERS, {virtualNodes: 8}); break;
-    default:  Object.assign(p, PARAMETERS); break;
+    default:  Object.assign(p, PARAMETERS, {quizProbability: 0}); break;
   }
   stopSimulation();
   drawParameters();
@@ -832,6 +832,7 @@ function stopSimulation() {
   resetSimulation();
   renderSimulation();
   drawButtons();
+  resetQuiz();
 }
 
 
@@ -887,6 +888,12 @@ function adjustParameters(fresh=false) {
   if (fresh) formNumber(data, 'virtual-nodes',    x => p.virtualNodes = x);
   formNumber(data, 'click-additions',  x => p.clickAdditions = x);
   formNumber(data, 'click-removals',   x => p.clickRemovals = x);
+}
+
+
+/** Hide the quiz form. */
+function resetQuiz() {
+  QUIZ_DIV.setAttribute('hidden', '');
 }
 
 
